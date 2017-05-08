@@ -1,32 +1,18 @@
 package com.mad.maintenancemanager;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
-import android.content.pm.PackageManager;
-import android.os.PersistableBundle;
+import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
 
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,20 +25,16 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static android.Manifest.permission.READ_CONTACTS;
-
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity  {
+public class LoginActivity extends AppCompatActivity {
+    public static final int REQUEST_CODE = 123;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
+    private EditText mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -61,6 +43,7 @@ public class LoginActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
@@ -75,12 +58,34 @@ public class LoginActivity extends AppCompatActivity  {
                 return false;
             }
         });
+        //Sets up the register button
+        final Button registerButton = (Button) findViewById(R.id.email_register_button);
+        registerButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+        });
 
-        Button emailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        //Sets up the sign in button
+        final Button emailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         emailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
+                getWindow().setSoftInputMode(
+                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
+                );
+            }
+        });
+
+
+        final Button signoutBtn = (Button) findViewById(R.id.email_signout_button);
+        signoutBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAuth.signOut();
             }
         });
 
@@ -93,9 +98,18 @@ public class LoginActivity extends AppCompatActivity  {
                 if (user != null) {
                     // User is signed in
                     Log.d(Constants.FIREBASE, "onAuthStateChanged:signed_in:" + user.getUid());
+                    Toast.makeText(LoginActivity.this, user.getEmail() + " is signed in", Toast.LENGTH_SHORT).show();
+                    emailSignInButton.setVisibility(View.GONE);
+                    registerButton.setVisibility(View.GONE);
+                    signoutBtn.setVisibility(View.VISIBLE);
+
                 } else {
                     // User is signed out
                     Log.d(Constants.FIREBASE, "onAuthStateChanged:signed_out");
+                    Toast.makeText(LoginActivity.this, "No user signed in", Toast.LENGTH_SHORT).show();
+                    signoutBtn.setVisibility(View.GONE);
+                    emailSignInButton.setVisibility(View.VISIBLE);
+                    registerButton.setVisibility(View.VISIBLE);
                 }
                 // ...
             }
@@ -110,9 +124,9 @@ public class LoginActivity extends AppCompatActivity  {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuth != null) {
-            return;
-        }
+//        if (mAuth != null) {
+//            return;
+//        }
 
         // Reset errors.
         mEmailView.setError(null);
@@ -126,7 +140,7 @@ public class LoginActivity extends AppCompatActivity  {
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (!isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -162,7 +176,7 @@ public class LoginActivity extends AppCompatActivity  {
                             // signed in user can be handled in the listener.
                             if (!task.isSuccessful()) {
                                 Log.w(Constants.FIREBASE, "signInWithEmail:failed", task.getException());
-                                Toast.makeText(LoginActivity.this, R.string.auth_error,
+                                Toast.makeText(LoginActivity.this, task.getException().toString(),
                                         Toast.LENGTH_SHORT).show();
                             }
 
@@ -174,7 +188,23 @@ public class LoginActivity extends AppCompatActivity  {
         }
     }
 
-    private void createUser(String email, String password){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CODE:
+                if (resultCode == Activity.RESULT_OK) {
+                    String email = data.getStringExtra(Constants.EMAIL);
+                    String password = data.getStringExtra(Constants.PASSWORD);
+                    createUser(email,password);
+                } else {
+                    Toast.makeText(LoginActivity.this, getString(R.string.register_cancelled), Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+
+    }
+
+    private void createUser(String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -193,6 +223,7 @@ public class LoginActivity extends AppCompatActivity  {
                     }
                 });
     }
+
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
@@ -217,7 +248,6 @@ public class LoginActivity extends AppCompatActivity  {
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
-
 
 
 }
