@@ -3,6 +3,7 @@ package com.mad.maintenancemanager;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -16,14 +17,22 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.ErrorCodes;
+import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.ResultCodes;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Arrays;
 
 /**
  * A login screen that offers login via email/password.
@@ -34,8 +43,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     // UI references.
-    private EditText mEmailView;
-    private EditText mPasswordView;
+
     private View mProgressView;
     private View mLoginFormView;
 
@@ -44,29 +52,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mLoginFormView = (LinearLayout) findViewById(R.id.login_layout);
 
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-        //Sets up the register button
-        final Button registerButton = (Button) findViewById(R.id.email_register_button);
-        registerButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivityForResult(intent, REQUEST_CODE);
-            }
-        });
 
         //Sets up the sign in button
         final Button emailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
@@ -74,18 +61,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 attemptLogin();
-                getWindow().setSoftInputMode(
-                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
-                );
-            }
-        });
-
-
-        final Button signoutBtn = (Button) findViewById(R.id.email_signout_button);
-        signoutBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAuth.signOut();
             }
         });
 
@@ -98,20 +73,14 @@ public class LoginActivity extends AppCompatActivity {
                 if (user != null) {
                     // User is signed in
                     Log.d(Constants.FIREBASE, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Toast.makeText(LoginActivity.this, user.getEmail() + " is signed in", Toast.LENGTH_SHORT).show();
-                    emailSignInButton.setVisibility(View.GONE);
-                    registerButton.setVisibility(View.GONE);
-                    signoutBtn.setVisibility(View.VISIBLE);
+                    Intent intent = new Intent(LoginActivity.this, SignedInUserActivity.class);
+                    startActivity(intent);
 
                 } else {
                     // User is signed out
                     Log.d(Constants.FIREBASE, "onAuthStateChanged:signed_out");
-                    Toast.makeText(LoginActivity.this, "No user signed in", Toast.LENGTH_SHORT).show();
-                    signoutBtn.setVisibility(View.GONE);
-                    emailSignInButton.setVisibility(View.VISIBLE);
-                    registerButton.setVisibility(View.VISIBLE);
                 }
-                // ...
+
             }
         };
 
@@ -124,104 +93,54 @@ public class LoginActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-//        if (mAuth != null) {
-//            return;
-//        }
-
-        // Reset errors.
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
-
-        // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
-
-        boolean cancel = false;
-        View focusView = null;
-
-        // Check for a valid password, if the user entered one.
-        if (!isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
-        }
-
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            focusView.requestFocus();
-        } else {
-
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            Log.d(Constants.FIREBASE, "signInWithEmail:onComplete:" + task.isSuccessful());
-
-                            // If sign in fails, display a message to the user. If sign in succeeds
-                            // the auth state listener will be notified and logic to handle the
-                            // signed in user can be handled in the listener.
-                            if (!task.isSuccessful()) {
-                                Log.w(Constants.FIREBASE, "signInWithEmail:failed", task.getException());
-                                Toast.makeText(LoginActivity.this, task.getException().toString(),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-
-                            // ...
-                        }
-                    });
-//            mAuthTask = new UserLoginTask(email, password);
-//            mAuthTask.execute((Void) null);
-        }
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setIsSmartLockEnabled(false)
+                        .setLogo(R.drawable.logo2)
+                        .setTheme(R.style.AppTheme)
+                        .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
+                                new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
+                        .build(),
+                REQUEST_CODE);
     }
 
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CODE:
-                if (resultCode == Activity.RESULT_OK) {
-                    String email = data.getStringExtra(Constants.EMAIL);
-                    String password = data.getStringExtra(Constants.PASSWORD);
-                    createUser(email,password);
-                } else {
-                    Toast.makeText(LoginActivity.this, getString(R.string.register_cancelled), Toast.LENGTH_SHORT).show();
-                }
-                break;
-        }
+        super.onActivityResult(requestCode, resultCode, data);
+        // RC_SIGN_IN is the request code you passed into startActivityForResult(...) when starting the sign in flow.
+        if (requestCode == REQUEST_CODE) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
 
+            // Successfully signed in
+            if (resultCode == ResultCodes.OK) {
+                startActivity(SignedInActivity.createIntent(this, response));
+                finish();
+                return;
+            } else {
+                // Sign in failed
+                if (response == null) {
+                    // User pressed back button
+                    showSnackbar(getString(R.string.sign_in_cancelled));
+                    return;
+                }
+
+                if (response.getErrorCode() == ErrorCodes.NO_NETWORK) {
+                    showSnackbar(getString(R.string.no_connection));
+                    return;
+                }
+
+                if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
+                    showSnackbar(getString(R.string.unknown_error));
+                    return;
+                }
+            }
+
+            showSnackbar(getString(R.string.unknown_sign_in_response));
+        }
     }
 
-    private void createUser(String email, String password) {
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(Constants.FIREBASE, "createUserWithEmail:onComplete:" + task.isSuccessful());
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(LoginActivity.this, R.string.auth_error,
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                        // ...
-                    }
-                });
+    private void showSnackbar(String message) {
+        Snackbar.make(mLoginFormView.getRootView(), message, Snackbar.LENGTH_SHORT).show();
     }
 
 

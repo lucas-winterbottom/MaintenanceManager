@@ -16,15 +16,21 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
-            android:label="Sign In">
+            android:label="Maintenance Manager">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity"
-            android:label="Register"/>
+        <activity
+            android:name=".RegisterActivity"
+            android:label="Register" />
+        <activity android:name=".SignedInActivity" />
+        <activity
+            android:name=".SignedInUserActivity"
+            android:label="@string/title_activity_signed_in_user"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

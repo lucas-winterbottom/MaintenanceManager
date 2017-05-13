@@ -17,4 +17,16 @@
     <string name="auth_error">Unable to Create Account</string>
     <string name="cancel">cancel</string>
     <string name="register_cancelled">Registering Cancelled</string>
+    <string name="no_connection">No Internet Connection</string>
+    <string name="sign_in_cancelled">Sign in Cancelled</string>
+    <string name="unknown_error">Unknown Error</string>
+    <string name="unknown_sign_in_response">Unknown Response</string>
+    <string name="cont">Continue</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="title_activity_signed_in_user">SignedInUserActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 </resources>
