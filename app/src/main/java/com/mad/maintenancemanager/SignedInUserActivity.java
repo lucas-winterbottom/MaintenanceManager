@@ -1,12 +1,14 @@
 package com.mad.maintenancemanager;
 
+import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,11 +17,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.mad.maintenancemanager.userActivites.GroupTasks;
+import com.mad.maintenancemanager.userActivites.MyTasks;
+import com.squareup.picasso.Picasso;
 
 public class SignedInUserActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -28,39 +35,51 @@ public class SignedInUserActivity extends AppCompatActivity
     private TextView mEmailTv;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private TextView mNameTV;
+    private ImageView mUserImage;
+    protected NavigationView navigationView;
+    protected FirebaseUser mUser;
+    private DrawerLayout mDrawer;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signed_in_user);
+
+        //My Stuff
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        navigationView.getMenu().getItem(0).setChecked(true);
+        onNavigationItemSelected(navigationView.getMenu().getItem(0));
 
         //Firebase Stuff
         mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
-        Toast.makeText(SignedInUserActivity.this, user.getEmail() + " is signed in", Toast.LENGTH_SHORT).show();
+        mUser = mAuth.getCurrentUser();
 
-        mEmailTv = (TextView) navigationView.getHeaderView(0).findViewById(R.id.signed_in_user_email);
-        mEmailTv.setText(user.getEmail());
+        //Populate navigation drawer with user data
+        mEmailTv = (TextView) navigationView.getHeaderView(0).
+                findViewById(R.id.signed_in_user_email);
+        mEmailTv.setText(mUser.getEmail());
 
-        mNameTV = (TextView) navigationView.getHeaderView(0).findViewById(R.id.signed_in_username);
-        mNameTV.setText(user.getDisplayName());
+        mNameTV = (TextView) navigationView.getHeaderView(0).
+                findViewById(R.id.signed_in_username);
+        mNameTV.setText(mUser.getDisplayName());
 
-        getSupportActionBar().setTitle(navigationView.getMenu().getItem(0).getTitle());
+        mUserImage = (ImageView) navigationView.getHeaderView(0).
+                findViewById(R.id.signed_in_user_image);
+        Picasso.with(SignedInUserActivity.this).load(mUser.getPhotoUrl()).
+                into(mUserImage);
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
+        mAuthListener = new FirebaseAuth.AuthStateListener()
+
+        {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -71,13 +90,10 @@ public class SignedInUserActivity extends AppCompatActivity
                 } else {
                     // User is signed out
                     Log.d(Constants.FIREBASE, "onAuthStateChanged:signed_out");
-                    Toast.makeText(SignedInUserActivity.this, "No user signed in", Toast.LENGTH_SHORT).show();
 
                 }
-
             }
         };
-
     }
 
     @Override
@@ -88,6 +104,12 @@ public class SignedInUserActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    public static Intent createIntent(Context context, IdpResponse idpResponse) {
+        Intent in = IdpResponse.getIntent(idpResponse);
+        in.setClass(context, SignedInUserActivity.class);
+        return in;
     }
 
     @Override
@@ -104,25 +126,32 @@ public class SignedInUserActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        getSupportActionBar().setTitle(item.getTitle());
+        Fragment fragment = new Fragment();
+        if (!item.isChecked()) {
+            if (id == R.id.nav_my_tasks) {
+                fragment = new MyTasks();
+            } else if (id == R.id.nav_group_tasks) {
+                fragment = new GroupTasks();
+            } else if (id == R.id.nav_completed_tasks) {
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+            } else if (id == R.id.nav_group) {
 
-        } else if (id == R.id.nav_slideshow) {
+            } else if (id == R.id.nav_account_settings) {
 
-        } else if (id == R.id.nav_manage) {
+            } else if (id == R.id.nav_sign_out) {
+                mAuth.signOut();
+                startActivity(new Intent(SignedInUserActivity.this, LoginActivity.class));
+                finish();
+            }
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, fragment).commit();
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_sign_out) {
-            mAuth.signOut();
-            startActivity(new Intent(SignedInUserActivity.this,LoginActivity.class));
+            // update selected item and title, then close the drawer
+            item.setChecked(true);
+            getSupportActionBar().setTitle(item.getTitle());
+            mDrawer.closeDrawer(GravityCompat.START);
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 }
