@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:fab="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/activity_horizontal_margin"
+                tools:context="com.mad.maintenancemanager.userActivites.GroupFragment">
+    <TextView
+        android:id="@+id/group_group_name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        style="@style/TextAppearance.AppCompat.Title"
+        />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/group_group_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/group_group_name_tv"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        fab:menu_colorNormal="@color/colorAccent">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/group_existing_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_label="@string/join_e_group"
+            fab:fab_size="mini"
+            fab:menu_colorNormal="@color/colorAccent"
+            />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/group_new_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_label="@string/create_n_group"
+            fab:fab_size="mini"
+            fab:menu_colorNormal="@color/colorAccent"
+            />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/group_new_member"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_label="Invite new Member"
+            fab:fab_size="mini"
+            android:visibility="gone"
+            fab:menu_colorNormal="@color/colorAccent"
+            />
+
+    </com.github.clans.fab.FloatingActionMenu>
+
+
+</RelativeLayout>

@@ -20,10 +20,18 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.mad.maintenancemanager.model.User;
+import com.mad.maintenancemanager.userActivites.GroupFragment;
 import com.mad.maintenancemanager.userActivites.GroupTasks;
 import com.mad.maintenancemanager.userActivites.MyTasks;
 import com.squareup.picasso.Picasso;
@@ -76,6 +84,7 @@ public class SignedInUserActivity extends AppCompatActivity
                 findViewById(R.id.signed_in_user_image);
         Picasso.with(SignedInUserActivity.this).load(mUser.getPhotoUrl()).
                 into(mUserImage);
+        checkUserData(mUser.getUid(), mUser.getDisplayName());
 
         mAuthListener = new FirebaseAuth.AuthStateListener()
 
@@ -94,6 +103,26 @@ public class SignedInUserActivity extends AppCompatActivity
                 }
             }
         };
+    }
+
+    private void checkUserData(final String currentUserID, final String displayName) {
+        final DatabaseReference dataRef =  FirebaseDatabase.getInstance().getReference(Constants.USERS).child(currentUserID);
+        dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if(user == null){
+                    dataRef.setValue(new User(displayName,null,false ));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 
     @Override
@@ -135,7 +164,7 @@ public class SignedInUserActivity extends AppCompatActivity
             } else if (id == R.id.nav_completed_tasks) {
 
             } else if (id == R.id.nav_group) {
-
+                fragment = new GroupFragment();
             } else if (id == R.id.nav_account_settings) {
 
             } else if (id == R.id.nav_sign_out) {

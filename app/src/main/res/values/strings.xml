@@ -96,7 +96,7 @@
         <item>3</item>
     </string-array>
 
-    <string-array name="multi_select_list_preference_default_value" />
+    <string-array name="multi_select_list_preference_default_value"/>
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
 
@@ -109,4 +109,16 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="create_n_group">Create New Group</string>
+    <string name="join_e_group">Join Existing Group</string>
+    <string name="creation_cancelled">Creation cancelled</string>
+    <string name="task_name">Task Name</string>
+    <string name="task_description">Task Description</string>
+    <string name="task_creator_id">Task Creator ID</string>
+    <string name="user_name">User Name</string>
+    <string name="group_key">Group Key</string>
+    <string name="join_group">Join group</string>
 </resources>

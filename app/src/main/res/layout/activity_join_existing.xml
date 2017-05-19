@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.mad.maintenancemanager.userActivites.JoinExisting"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="@string/join_e_group"
+        android:gravity="center"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin">
+        <EditText
+            android:id="@+id/existing_group_key_et"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="@string/group_key"/>
+    </android.support.design.widget.TextInputLayout>
+    <Button
+        android:id="@+id/existing_group_join_btn"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="40dp"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:text="@string/join_group"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold" />
+    <Button
+        android:id="@+id/existing_group_cancel_btn"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:text="Cancel"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold" />
+</LinearLayout>

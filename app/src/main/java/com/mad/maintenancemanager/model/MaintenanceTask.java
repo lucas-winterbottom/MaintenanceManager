@@ -1,5 +1,8 @@
 package com.mad.maintenancemanager.model;
 
+import java.net.URL;
+import java.util.List;
+
 /**
  * Created by lucaswinterbottom on 14/5/17.
  */
@@ -10,7 +13,58 @@ public class MaintenanceTask {
     private String mName;
     private String mDescription;
     private boolean mTaskType;
+    private String mAssignedTo;
+    private List<String> mNeededItems;
+    private URL mImageURL;
+    private String mTradeType;
 
+    public MaintenanceTask(int ID, String creatorID, String name, String description, boolean taskType, String assignedTo, List<String> neededItems, URL imageURL, String tradeType) {
+        mID = ID;
+        mCreatorID = creatorID;
+        mName = name;
+        mDescription = description;
+        mTaskType = taskType;
+        mAssignedTo = assignedTo;
+        mNeededItems = neededItems;
+        mImageURL = imageURL;
+        mTradeType = tradeType;
+    }
+
+    public MaintenanceTask() {
+        //For Firebase
+    }
+
+    public String getAssignedTo() {
+        return mAssignedTo;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        mAssignedTo = assignedTo;
+    }
+
+    public List<String> getNeededItems() {
+        return mNeededItems;
+    }
+
+    public void setNeededItems(List<String> neededItems) {
+        mNeededItems = neededItems;
+    }
+
+    public URL getImageURL() {
+        return mImageURL;
+    }
+
+    public void setImageURL(URL imageURL) {
+        mImageURL = imageURL;
+    }
+
+    public String getTradeType() {
+        return mTradeType;
+    }
+
+    public void setTradeType(String tradeType) {
+        mTradeType = tradeType;
+    }
 
     public int getID() {
         return mID;
@@ -52,15 +106,5 @@ public class MaintenanceTask {
         mTaskType = taskType;
     }
 
-    public MaintenanceTask(int mID, String mCreatorID, String mName, String mDescription, boolean mTaskType) {
-        this.mID = mID;
-        this.mCreatorID = mCreatorID;
-        this.mName = mName;
-        this.mDescription = mDescription;
-        this.mTaskType = mTaskType;
-    }
-    public  MaintenanceTask(){
-        //For Firebase
-    }
 
 }
