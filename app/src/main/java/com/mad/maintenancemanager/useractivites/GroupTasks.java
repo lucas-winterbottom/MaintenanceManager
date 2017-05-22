@@ -102,11 +102,7 @@ public class GroupTasks extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
         final FirebaseUser user = mAuth.getCurrentUser();
-
-
         mTaskRef = FirebaseDatabase.getInstance().getReference(Constants.TASKS_ACTIVE_TASKS).child(groupKey);
-
-
         mAdapter = new FirebaseRecyclerAdapter<MaintenanceTask, MaintenanceTaskHolder>(MaintenanceTask.class, R.layout.task_card, MaintenanceTaskHolder.class, mTaskRef) {
 
             @Override
@@ -121,26 +117,6 @@ public class GroupTasks extends Fragment {
                     maintenanceTaskHolder.setAssignee(maintenanceTask.getAssignedTo());
                 }
                 //hideProgress();
-                maintenanceTaskHolder.setLongClick(makeLongClick(maintenanceTask.getName(), i));
-
-                maintenanceTaskHolder.setLongClick(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setTitle(maintenanceTask.getName())
-
-                                .setItems(R.array.options_array, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // The 'which' argument contains the index position
-                                        // of the selected item
-                                    }
-                                });
-                        AlertDialog alertDialog = builder.create();
-                        alertDialog.show();
-                        return true;
-                    }
-                });
             }
 
             @Override
@@ -152,9 +128,7 @@ public class GroupTasks extends Fragment {
         mRecycler.setAdapter(mAdapter);
     }
 
-    private View.OnLongClickListener makeLongClick(String name, int i) {
 
-    }
 
     /**
      * Handles the feedback from the NewTaskActivity
