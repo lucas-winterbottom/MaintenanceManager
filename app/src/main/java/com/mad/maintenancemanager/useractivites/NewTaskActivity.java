@@ -1,4 +1,4 @@
-package com.mad.maintenancemanager.userActivites;
+package com.mad.maintenancemanager.useractivites;
 
 import android.content.Intent;
 import android.support.design.widget.TextInputEditText;
@@ -22,8 +22,6 @@ import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
 import com.mad.maintenancemanager.model.Group;
 import com.mad.maintenancemanager.model.User;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -100,7 +98,6 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Group group = dataSnapshot.child(groupKey).getValue(Group.class);
-                Toast.makeText(NewTaskActivity.this, group.getGroupMembers().toString(), Toast.LENGTH_LONG).show();
                 mGroupMembers = group.getGroupMembers();
                 setupMemberSpinner();
             }

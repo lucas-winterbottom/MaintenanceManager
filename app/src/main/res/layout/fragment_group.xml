@@ -5,7 +5,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="@dimen/activity_horizontal_margin"
-                tools:context="com.mad.maintenancemanager.userActivites.GroupFragment">
+                tools:context="com.mad.maintenancemanager.useractivites.GroupFragment">
     <TextView
         android:id="@+id/group_group_name_tv"
         android:layout_width="wrap_content"

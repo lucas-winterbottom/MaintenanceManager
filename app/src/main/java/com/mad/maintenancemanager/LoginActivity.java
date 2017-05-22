@@ -18,7 +18,6 @@ import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.ResultCodes;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.mad.maintenancemanager.userActivites.MyTasks;
 
 import java.util.Arrays;
 

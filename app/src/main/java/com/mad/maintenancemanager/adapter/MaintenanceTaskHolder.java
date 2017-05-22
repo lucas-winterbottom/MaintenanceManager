@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.mad.maintenancemanager.R;
 
 public class MaintenanceTaskHolder extends RecyclerView.ViewHolder {
-    private final TextView mName, mDescription, mCreatorId, mAssignedTo;
+    private final TextView mName, mDescription, mCreatorId, mAssignedTo, mItems;
     private final ImageView mTaskType;
     private final CardView mCardView;
 
@@ -22,6 +22,7 @@ public class MaintenanceTaskHolder extends RecyclerView.ViewHolder {
         mTaskType = (ImageView) itemView.findViewById(R.id.task_type);
         mAssignedTo = (TextView) itemView.findViewById(R.id.task_assignee);
         mCardView = (CardView) itemView.findViewById(R.id.task_card_view);
+        mItems = (TextView) itemView.findViewById(R.id.task_items);
     }
 
     public void setName(String name) {
@@ -44,12 +45,29 @@ public class MaintenanceTaskHolder extends RecyclerView.ViewHolder {
         }
     }
 
+    public void setItems(String items) {
+
+        mItems.setText(items);
+    }
+
+    public void setItemsVisibility() {
+        if (mItems.getVisibility() == View.GONE) {
+            mItems.setVisibility(View.VISIBLE);
+        } else {
+            mItems.setVisibility(View.GONE);
+        }
+    }
+
     public void setAssignee(String assignee) {
-        mAssignedTo.setText(assignee);
+         mAssignedTo.setText(assignee);
     }
 
     public void setLongClick(View.OnLongClickListener longClick) {
         mCardView.setOnLongClickListener(longClick);
+    }
+
+    public void setClick(View.OnClickListener tap) {
+        mCardView.setOnClickListener(tap);
     }
 
 

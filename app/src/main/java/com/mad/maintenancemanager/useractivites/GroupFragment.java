@@ -1,4 +1,4 @@
-package com.mad.maintenancemanager.userActivites;
+package com.mad.maintenancemanager.useractivites;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,13 +36,14 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
 
     public static final int REQUEST_CODE = 123;
     public static final int REQUEST_CODE1 = 1234;
-    public static final String GROUP_NAME_DATA = "groupName";
     public static final String JOINING_CANCELLED = "Joining Cancelled";
     private DatabaseReference mRef;
     private FirebaseAuth mAuth;
     private TextView mGroupName;
     private FirebaseRecyclerAdapter<String, MemberHolder> mAdapter;
     private RecyclerView mRecycler;
+    private FloatingActionButton mNewGroupTab,mAddMemberFab,mExistingGroupFab;
+
 
     public GroupFragment() {
         // Required empty public constructor
@@ -58,48 +59,52 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         mGroupName = (TextView) rootView.findViewById(R.id.group_group_name_tv);
         mRecycler = (RecyclerView) rootView.findViewById(R.id.group_group_recycler);
 
-
         //FAB Setup
-        final FloatingActionButton newGroupFab = (FloatingActionButton) rootView.findViewById(R.id.group_new_group);
-        newGroupFab.setOnClickListener(this);
-        final FloatingActionButton existingGroupFab = (FloatingActionButton) rootView.findViewById(R.id.group_existing_group);
-        existingGroupFab.setOnClickListener(this);
-        final FloatingActionButton addMember = (FloatingActionButton) rootView.findViewById(R.id.group_new_member);
-        existingGroupFab.setOnClickListener(this);
+        mNewGroupTab = (FloatingActionButton) rootView.findViewById(R.id.group_new_group);
+        mNewGroupTab.setOnClickListener(this);
+        mExistingGroupFab = (FloatingActionButton) rootView.findViewById(R.id.group_existing_group);
+        mExistingGroupFab.setOnClickListener(this);
+        mAddMemberFab = (FloatingActionButton) rootView.findViewById(R.id.group_new_member);
+        mAddMemberFab.setOnClickListener(this);
+
+        getGroupKey();
 
 
+        return rootView;
+    }
+
+    private void getGroupKey() {
         DatabaseReference userInfo = FirebaseDatabase.getInstance().getReference(Constants.USERS);
         userInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.child(mAuth.getCurrentUser().getUid()).getValue(User.class);
                 if (user.getGroupKey() != null) {
-                    existingGroupFab.setVisibility(View.GONE);
-                    newGroupFab.setVisibility(View.GONE);
-                    addMember.setVisibility(View.VISIBLE);
-
-                    getGroupKey(user.getGroupKey());
+                    alternateFabs();
+                    getGroup(user.getGroupKey());
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // ...
             }
         });
+    }
 
-
-        return rootView;
+    private void alternateFabs() {
+        mExistingGroupFab.setVisibility(View.GONE);
+        mNewGroupTab.setVisibility(View.GONE);
+        mAddMemberFab.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if(id == R.id.group_new_group){
+        if (id == R.id.group_new_group) {
             Intent intent = new Intent(getContext(), NewGroupActivity.class);
             startActivityForResult(intent, REQUEST_CODE);
         }
-        if(id == R.id.group_existing_group){
+        if (id == R.id.group_existing_group) {
             Intent intent2 = new Intent(getContext(), JoinExisting.class);
             startActivityForResult(intent2, REQUEST_CODE1);
         }
@@ -107,10 +112,11 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         //// TODO: 20/5/17 Add method to invite user.
     }
 
-    public void getGroupKey(final String groupKey) {
+    public void getGroup(final String groupKey) {
 
         DatabaseReference group = FirebaseDatabase.getInstance().getReference(Constants.GROUPS);
         group.addListenerForSingleValueEvent(new ValueEventListener() {
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Group group = dataSnapshot.child(groupKey).getValue(Group.class);

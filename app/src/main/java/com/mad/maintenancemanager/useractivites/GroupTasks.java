@@ -1,4 +1,4 @@
-package com.mad.maintenancemanager.userActivites;
+package com.mad.maintenancemanager.useractivites;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,10 +24,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
 import com.mad.maintenancemanager.adapter.MaintenanceTaskHolder;
-import com.mad.maintenancemanager.model.Group;
 import com.mad.maintenancemanager.model.MaintenanceTask;
 import com.mad.maintenancemanager.model.User;
 
+/**
+ * Fragment that shows the user the tasks for the group they are currently in, gathers the users
+ * group and then uses that to gather the
+ */
 public class GroupTasks extends Fragment {
 
     public static final int REQUEST_CODE = 123;
@@ -36,6 +39,9 @@ public class GroupTasks extends Fragment {
     private RecyclerView mRecycler;
     private FirebaseRecyclerAdapter<MaintenanceTask, MaintenanceTaskHolder> mAdapter;
 
+    /**
+     * Empty constructor for fragment use
+     */
     public GroupTasks() {
 
     }
@@ -62,6 +68,11 @@ public class GroupTasks extends Fragment {
 
         return rootView;
     }
+
+    /**
+     * Gets the user data from Firebase and then extracts the group key to setup recycler
+     * @param userID Currently Signed in users ID
+     */
     public void getGroupKey(final String userID){
         DatabaseReference userInfo = FirebaseDatabase.getInstance().getReference(Constants.USERS);
         userInfo.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -80,6 +91,10 @@ public class GroupTasks extends Fragment {
         });
     }
 
+    /**
+     * Method to setup the FirebaseRecyclerView with only tasks made by your group
+     * @param groupKey
+     */
 
     public void setupRecycler(String groupKey) {
         mRecycler.setHasFixedSize(false);
@@ -89,7 +104,7 @@ public class GroupTasks extends Fragment {
         final FirebaseUser user = mAuth.getCurrentUser();
 
 
-        mTaskRef = FirebaseDatabase.getInstance().getReference(Constants.TASKS).child(groupKey);
+        mTaskRef = FirebaseDatabase.getInstance().getReference(Constants.TASKS_ACTIVE_TASKS).child(groupKey);
 
 
         mAdapter = new FirebaseRecyclerAdapter<MaintenanceTask, MaintenanceTaskHolder>(MaintenanceTask.class, R.layout.task_card, MaintenanceTaskHolder.class, mTaskRef) {
@@ -106,6 +121,8 @@ public class GroupTasks extends Fragment {
                     maintenanceTaskHolder.setAssignee(maintenanceTask.getAssignedTo());
                 }
                 //hideProgress();
+                maintenanceTaskHolder.setLongClick(makeLongClick(maintenanceTask.getName(), i));
+
                 maintenanceTaskHolder.setLongClick(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
@@ -135,10 +152,17 @@ public class GroupTasks extends Fragment {
         mRecycler.setAdapter(mAdapter);
     }
 
+    private View.OnLongClickListener makeLongClick(String name, int i) {
+
+    }
+
+    /**
+     * Handles the feedback from the NewTaskActivity
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(Constants.TASKS).child(data.getStringExtra(Constants.GROUP_KEY));
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(Constants.TASKS_ACTIVE_TASKS).child(data.getStringExtra(Constants.GROUP_KEY));
         FirebaseAuth.getInstance().getCurrentUser().getUid();
         if (requestCode == REQUEST_CODE) {
             if (resultCode == ResultCodes.OK) {
@@ -149,7 +173,7 @@ public class GroupTasks extends Fragment {
                                 data.getStringExtra(Constants.TASK_DESCRIPTION),
                                 data.getBooleanExtra(Constants.CONTRACTOR_NEEDED, false),
                                 data.getStringExtra(Constants.ASSIGNED_MEMBER),
-                                data.getStringArrayListExtra(Constants.TASK_ITEMS)));
+                                data.getStringExtra(Constants.TASK_ITEMS)));
             }
 
 

@@ -1,7 +1,6 @@
 package com.mad.maintenancemanager.model;
 
 import java.net.URL;
-import java.util.List;
 
 /**
  * Created by lucaswinterbottom on 14/5/17.
@@ -13,20 +12,20 @@ public class MaintenanceTask {
     private String mDescription;
     private boolean mTaskType;
     private String mAssignedTo;
-    private List<String> mNeededItems;
+    private String mNeededItems;
     //private URL mImageURL;
     private String mTradeType;
-    private boolean mtaskCompleted;
+    private boolean mTaskCompleted;
 
     public boolean isMtaskCompleted() {
-        return mtaskCompleted;
+        return mTaskCompleted;
     }
 
     public void setMtaskCompleted(boolean mtaskCompleted) {
-        this.mtaskCompleted = mtaskCompleted;
+        this.mTaskCompleted = mtaskCompleted;
     }
 
-    public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, List<String> neededItems, URL imageURL, String tradeType) {
+    public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, String neededItems, URL imageURL, String tradeType) {
         mCreatorID = creatorID;
         mName = name;
         mDescription = description;
@@ -35,18 +34,18 @@ public class MaintenanceTask {
         mNeededItems = neededItems;
        // mImageURL = imageURL;
         mTradeType = tradeType;
-        mtaskCompleted = false;
+        mTaskCompleted = false;
 
     }
 
-    public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, List<String> neededItems) {
+    public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, String neededItems) {
         mCreatorID = creatorID;
         mName = name;
         mDescription = description;
         mTaskType = taskType;
         mAssignedTo = assignedTo;
         mNeededItems = neededItems;
-        mtaskCompleted = false;
+        mTaskCompleted = false;
     }
 
     public MaintenanceTask() {
@@ -61,11 +60,11 @@ public class MaintenanceTask {
         mAssignedTo = assignedTo;
     }
 
-    public List<String> getNeededItems() {
+    public String getNeededItems() {
         return mNeededItems;
     }
 
-    public void setNeededItems(List<String> neededItems) {
+    public void setNeededItems(String neededItems) {
         mNeededItems = neededItems;
     }
 

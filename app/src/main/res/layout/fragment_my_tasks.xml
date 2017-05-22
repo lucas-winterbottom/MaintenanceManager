@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.mad.maintenancemanager.userActivites.MyTasks">
+    tools:context="com.mad.maintenancemanager.useractivites.MyTasks">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_tasks_recycler"
@@ -20,5 +20,24 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"/>
 
+    <TextView
+        android:id="@+id/no_group_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/you_are_not_part_of_a_group_n_please_join_a_group"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/no_task_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/no_tasks_are_assigned_to_you"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:visibility="gone"/>
 
 </RelativeLayout>

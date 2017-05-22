@@ -29,9 +29,9 @@
             android:label="@string/title_activity_signed_in_user"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".userActivites.NewTaskActivity"/>
-        <activity android:name=".userActivites.NewGroupActivity"/>
-        <activity android:name=".userActivites.JoinExisting">
+        <activity android:name=".useractivites.NewTaskActivity"/>
+        <activity android:name=".useractivites.NewGroupActivity"/>
+        <activity android:name=".useractivites.JoinExisting">
         </activity>
     </application>
 

@@ -21,4 +21,6 @@ public class Constants {
     public static final String ASSIGNED_MEMBER = "Assigned member";
     public static final String CONTRACTOR_NEEDED = "contractorNeeded";
     public static final String TASKS = "Tasks";
+    public static final String TASKS_ACTIVE_TASKS = "Tasks/Active Tasks";
+    public static final String TASKS_COMPLETED_TASKS = "Tasks/Completed Tasks";
 }

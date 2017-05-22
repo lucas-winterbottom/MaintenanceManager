@@ -1,27 +1,22 @@
 package com.mad.maintenancemanager;
 
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,11 +27,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mad.maintenancemanager.model.User;
-import com.mad.maintenancemanager.userActivites.GroupFragment;
-import com.mad.maintenancemanager.userActivites.GroupTasks;
-import com.mad.maintenancemanager.userActivites.MyTasks;
+import com.mad.maintenancemanager.useractivites.GroupFragment;
+import com.mad.maintenancemanager.useractivites.GroupTasks;
+import com.mad.maintenancemanager.useractivites.MyTasks;
 import com.squareup.picasso.Picasso;
 
+/**
+ * Activity that is the basis for a user that is signed in and has a navigation drawer
+ * to navigate between fragments
+ */
 public class SignedInUserActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -107,16 +106,20 @@ public class SignedInUserActivity extends AppCompatActivity
     }
 
 
-
-
+    /**
+     * Checks if the user already has data on the server if not, sets up the base user on the server
+     *
+     * @param currentUserID The currently signed in users ID
+     * @param displayName   The Currently signed in users Display Name
+     */
     private void checkUserData(final String currentUserID, final String displayName) {
-        final DatabaseReference dataRef =  FirebaseDatabase.getInstance().getReference(Constants.USERS).child(currentUserID);
+        final DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference(Constants.USERS).child(currentUserID);
         dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-                if(user == null){
-                    dataRef.setValue(new User(displayName,null,false ));
+                if (user == null) {
+                    dataRef.setValue(new User(displayName, null, false));
                 }
             }
 
@@ -139,6 +142,13 @@ public class SignedInUserActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Creates an intent that includes the extra data from login in the intent
+     *
+     * @param context     Application Context
+     * @param idpResponse Response from login services
+     * @return The intent that includes the IDP data
+     */
     public static Intent createIntent(Context context, IdpResponse idpResponse) {
         Intent in = IdpResponse.getIntent(idpResponse);
         in.setClass(context, SignedInUserActivity.class);
@@ -151,7 +161,6 @@ public class SignedInUserActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.signed_in_user, menu);
         return true;
     }
-
 
 
     @SuppressWarnings("StatementWithEmptyBody")
