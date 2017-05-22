@@ -121,4 +121,21 @@
     <string name="user_name">User Name</string>
     <string name="group_key">Group Key</string>
     <string name="join_group">Join group</string>
+    <string name="fill_in_the_details_below_to_create_a_new_task">Fill in the details below to create a new task</string>
+    <string name="create_a_new_task">Create a new Task</string>
+    <string name="required_tools_or_items">Required tools or Items</string>
+    <string name="requires_contractor_assistance">Requires Contractor Assistance ?</string>
+    <string name="assign_to">Assign to</string>
+    <string name="assigned_to">Assigned to</string>
+    <string-array name="contractor_array">
+        <item>Electrician</item>
+        <item>Plumber</item>
+        <item>Carpenter</item>
+        <item>Painter</item>
+    </string-array>
+    <string-array name="options_array">
+        <item>Mark as Done</item>
+        <item>Delete</item>
+        <item>Cancel</item>
+    </string-array>
 </resources>

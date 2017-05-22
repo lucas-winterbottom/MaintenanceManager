@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -52,7 +53,6 @@ public class SignedInUserActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signed_in_user);
-
         //My Stuff
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -103,7 +103,11 @@ public class SignedInUserActivity extends AppCompatActivity
                 }
             }
         };
+
     }
+
+
+
 
     private void checkUserData(final String currentUserID, final String displayName) {
         final DatabaseReference dataRef =  FirebaseDatabase.getInstance().getReference(Constants.USERS).child(currentUserID);

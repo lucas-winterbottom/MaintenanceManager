@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -102,6 +103,8 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
             Intent intent2 = new Intent(getContext(), JoinExisting.class);
             startActivityForResult(intent2, REQUEST_CODE1);
         }
+
+        //// TODO: 20/5/17 Add method to invite user.
     }
 
     public void getGroupKey(final String groupKey) {
@@ -166,7 +169,8 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
             } else {
                 Snackbar.make(getView(), R.string.creation_cancelled, Snackbar.LENGTH_SHORT).show();
             }
-
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.detach(this).attach(this).commit();
         }
         if (requestCode == REQUEST_CODE1) {
             if (resultCode == ResultCodes.OK) {

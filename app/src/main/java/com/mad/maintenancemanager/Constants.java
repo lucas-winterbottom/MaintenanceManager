@@ -15,4 +15,10 @@ public class Constants {
     public static final String GROUPS = "Groups";
     public static final String USERS_SLASH = "Users/";
     public static final String GROUP_MEMBERS = "groupMembers";
+    public static final String TASK_ITEMS = "Task Items";
+    public static final String TASK_DESCRIPTION = "Task Description";
+    public static final String TASK_NAME = "Task Name";
+    public static final String ASSIGNED_MEMBER = "Assigned member";
+    public static final String CONTRACTOR_NEEDED = "contractorNeeded";
+    public static final String TASKS = "Tasks";
 }

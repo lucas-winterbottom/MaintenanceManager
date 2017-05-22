@@ -8,26 +8,45 @@ import java.util.List;
  */
 
 public class MaintenanceTask {
-    private int mID;
     private String mCreatorID;
     private String mName;
     private String mDescription;
     private boolean mTaskType;
     private String mAssignedTo;
     private List<String> mNeededItems;
-    private URL mImageURL;
+    //private URL mImageURL;
     private String mTradeType;
+    private boolean mtaskCompleted;
 
-    public MaintenanceTask(int ID, String creatorID, String name, String description, boolean taskType, String assignedTo, List<String> neededItems, URL imageURL, String tradeType) {
-        mID = ID;
+    public boolean isMtaskCompleted() {
+        return mtaskCompleted;
+    }
+
+    public void setMtaskCompleted(boolean mtaskCompleted) {
+        this.mtaskCompleted = mtaskCompleted;
+    }
+
+    public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, List<String> neededItems, URL imageURL, String tradeType) {
         mCreatorID = creatorID;
         mName = name;
         mDescription = description;
         mTaskType = taskType;
         mAssignedTo = assignedTo;
         mNeededItems = neededItems;
-        mImageURL = imageURL;
+       // mImageURL = imageURL;
         mTradeType = tradeType;
+        mtaskCompleted = false;
+
+    }
+
+    public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, List<String> neededItems) {
+        mCreatorID = creatorID;
+        mName = name;
+        mDescription = description;
+        mTaskType = taskType;
+        mAssignedTo = assignedTo;
+        mNeededItems = neededItems;
+        mtaskCompleted = false;
     }
 
     public MaintenanceTask() {
@@ -50,13 +69,13 @@ public class MaintenanceTask {
         mNeededItems = neededItems;
     }
 
-    public URL getImageURL() {
-        return mImageURL;
-    }
-
-    public void setImageURL(URL imageURL) {
-        mImageURL = imageURL;
-    }
+//    public URL getImageURL() {
+//        return mImageURL;
+//    }
+//
+//    public void setImageURL(URL imageURL) {
+//        mImageURL = imageURL;
+//    }
 
     public String getTradeType() {
         return mTradeType;
@@ -64,14 +83,6 @@ public class MaintenanceTask {
 
     public void setTradeType(String tradeType) {
         mTradeType = tradeType;
-    }
-
-    public int getID() {
-        return mID;
-    }
-
-    public void setID(int ID) {
-        this.mID = ID;
     }
 
     public String getCreatorID() {
