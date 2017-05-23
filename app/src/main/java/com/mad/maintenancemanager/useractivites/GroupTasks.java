@@ -24,8 +24,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
 import com.mad.maintenancemanager.adapter.MaintenanceTaskHolder;
+import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.model.MaintenanceTask;
 import com.mad.maintenancemanager.model.User;
+import com.mad.maintenancemanager.presenter.TasksPresenter;
 
 /**
  * Fragment that shows the user the tasks for the group they are currently in, gathers the users
@@ -52,6 +54,9 @@ public class GroupTasks extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_group_tasks, container, false);
 
 
+        mRecycler = (RecyclerView) rootView.findViewById(R.id.group_tasks_recycler);
+        mRecycler.setHasFixedSize(false);
+        mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.group_tasks_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,71 +66,16 @@ public class GroupTasks extends Fragment {
             }
         });
         // showProgress();
-
-        mRecycler = (RecyclerView) rootView.findViewById(R.id.group_tasks_recycler);
-        getGroupKey(mAuth.getCurrentUser().getUid());
-
+        TasksPresenter presenter = new TasksPresenter();
+        presenter.getRecyclerAdapter(Constants.TASKS_ACTIVE_TASKS, new TasksPresenter.IOnRecyclerAdapterListener() {
+            @Override
+            public void onRecyclerAdapter(FirebaseRecyclerAdapter adapter) {
+                mRecycler.setAdapter(adapter);
+                //hideProgress();
+            }
+        },getActivity());
 
         return rootView;
-    }
-
-    /**
-     * Gets the user data from Firebase and then extracts the group key to setup recycler
-     * @param userID Currently Signed in users ID
-     */
-    public void getGroupKey(final String userID){
-        DatabaseReference userInfo = FirebaseDatabase.getInstance().getReference(Constants.USERS);
-        userInfo.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.child(userID).getValue(User.class);
-                if (user.getGroupKey() != null) {
-                    setupRecycler(user.getGroupKey());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // ...
-            }
-        });
-    }
-
-    /**
-     * Method to setup the FirebaseRecyclerView with only tasks made by your group
-     * @param groupKey
-     */
-
-    public void setupRecycler(String groupKey) {
-        mRecycler.setHasFixedSize(false);
-        mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        mAuth = FirebaseAuth.getInstance();
-        final FirebaseUser user = mAuth.getCurrentUser();
-        mTaskRef = FirebaseDatabase.getInstance().getReference(Constants.TASKS_ACTIVE_TASKS).child(groupKey);
-        mAdapter = new FirebaseRecyclerAdapter<MaintenanceTask, MaintenanceTaskHolder>(MaintenanceTask.class, R.layout.task_card, MaintenanceTaskHolder.class, mTaskRef) {
-
-            @Override
-            protected void populateViewHolder(MaintenanceTaskHolder maintenanceTaskHolder, final MaintenanceTask maintenanceTask, final int i) {
-                maintenanceTaskHolder.setCreatorId(maintenanceTask.getCreatorID());
-                maintenanceTaskHolder.setDescription(maintenanceTask.getDescription());
-                maintenanceTaskHolder.setName(maintenanceTask.getName());
-                maintenanceTaskHolder.setTaskType(maintenanceTask.isTaskType());
-                if (maintenanceTask.getAssignedTo().equals(user.getDisplayName())) {
-                    maintenanceTaskHolder.setAssignee("You");
-                } else {
-                    maintenanceTaskHolder.setAssignee(maintenanceTask.getAssignedTo());
-                }
-                //hideProgress();
-            }
-
-            @Override
-            protected void onDataChanged() {
-                super.onDataChanged();
-                //hideProgress();
-            }
-        };
-        mRecycler.setAdapter(mAdapter);
     }
 
 
@@ -136,18 +86,14 @@ public class GroupTasks extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(Constants.TASKS_ACTIVE_TASKS).child(data.getStringExtra(Constants.GROUP_KEY));
-        FirebaseAuth.getInstance().getCurrentUser().getUid();
         if (requestCode == REQUEST_CODE) {
             if (resultCode == ResultCodes.OK) {
-                String key = databaseReference.push().getKey();
-                databaseReference.child(key).
-                        setValue(new MaintenanceTask(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
-                                data.getStringExtra(Constants.TASK_NAME),
-                                data.getStringExtra(Constants.TASK_DESCRIPTION),
-                                data.getBooleanExtra(Constants.CONTRACTOR_NEEDED, false),
-                                data.getStringExtra(Constants.ASSIGNED_MEMBER),
-                                data.getStringExtra(Constants.TASK_ITEMS)));
+                DatabaseHelper.getInstance().saveTask(new MaintenanceTask(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
+                        data.getStringExtra(Constants.TASK_NAME),
+                        data.getStringExtra(Constants.TASK_DESCRIPTION),
+                        data.getBooleanExtra(Constants.CONTRACTOR_NEEDED, false),
+                        data.getStringExtra(Constants.ASSIGNED_MEMBER),
+                        data.getStringExtra(Constants.TASK_ITEMS)));
             }
 
 

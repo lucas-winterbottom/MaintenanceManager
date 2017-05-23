@@ -15,15 +15,7 @@ public class MaintenanceTask {
     private String mNeededItems;
     //private URL mImageURL;
     private String mTradeType;
-    private boolean mTaskCompleted;
 
-    public boolean isMtaskCompleted() {
-        return mTaskCompleted;
-    }
-
-    public void setMtaskCompleted(boolean mtaskCompleted) {
-        this.mTaskCompleted = mtaskCompleted;
-    }
 
     public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, String neededItems, URL imageURL, String tradeType) {
         mCreatorID = creatorID;
@@ -34,7 +26,6 @@ public class MaintenanceTask {
         mNeededItems = neededItems;
        // mImageURL = imageURL;
         mTradeType = tradeType;
-        mTaskCompleted = false;
 
     }
 
@@ -45,7 +36,6 @@ public class MaintenanceTask {
         mTaskType = taskType;
         mAssignedTo = assignedTo;
         mNeededItems = neededItems;
-        mTaskCompleted = false;
     }
 
     public MaintenanceTask() {

@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
+import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.model.Group;
 import com.mad.maintenancemanager.model.User;
 
@@ -28,7 +29,6 @@ import java.util.List;
 public class NewTaskActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Spinner mGroupMemberSpinner;
-    private FirebaseAuth mAuth;
     private List<String> mGroupMembers;
     private Spinner mContractorSpinner;
     private Switch mContractorSwitch;
@@ -36,7 +36,6 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
     private TextInputEditText mTaskDescriptionEt;
     private TextInputEditText mTaskExtraItemsEt;
     private Button mSubmitButton;
-    private String mGroupKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,44 +66,11 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         mContractorSpinner.setAdapter(adapter);
-
-        mAuth = FirebaseAuth.getInstance();
-
-        getGroup();
-    }
-
-    public void getGroup() {
-        DatabaseReference userInfo = FirebaseDatabase.getInstance().getReference(Constants.USERS);
-        userInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseHelper.getInstance().getGroupMembers(new DatabaseHelper.IGroupListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.child(mAuth.getCurrentUser().getUid()).getValue(User.class);
-                if (user.getGroupKey() != null) {
-                    getGroupMembers(user.getGroupKey());
-                    mGroupKey = user.getGroupKey();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // ...
-            }
-        });
-    }
-
-    public void getGroupMembers(final String groupKey) {
-        DatabaseReference group = FirebaseDatabase.getInstance().getReference(Constants.GROUPS);
-        group.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Group group = dataSnapshot.child(groupKey).getValue(Group.class);
+            public void onGroup(Group group) {
                 mGroupMembers = group.getGroupMembers();
                 setupMemberSpinner();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
             }
         });
     }
@@ -127,8 +93,8 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
         result.putExtra(Constants.TASK_ITEMS, mTaskExtraItemsEt.getText().toString());
         result.putExtra(Constants.ASSIGNED_MEMBER, mGroupMemberSpinner.getSelectedItem().toString());
         result.putExtra(Constants.CONTRACTOR_NEEDED, mContractorSwitch.isChecked());
-        result.putExtra(Constants.GROUP_KEY,mGroupKey);
         setResult(RESULT_OK, result);
         finish();
     }
+
 }
