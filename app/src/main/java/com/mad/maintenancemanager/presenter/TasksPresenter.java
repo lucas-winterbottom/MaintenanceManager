@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -23,44 +24,65 @@ import com.mad.maintenancemanager.model.MaintenanceTask;
  */
 
 public class TasksPresenter {
+    private Context mContext;
+
+    public TasksPresenter(Context context){
+        mContext = context;
+    }
 
     /**
      * Gets the user data from Firebase and then extracts the group key to setup recycler
-     * <p>
-     * Method to setup the FirebaseRecyclerView with only tasks assigned to you
+     *
      */
 
-    public void getRecyclerAdapter(final String databasePath, final IOnRecyclerAdapterListener listener, final Context activityContext) {
+    public void getRecyclerAdapter(final String databasePath, final IOnRecyclerAdapterListener listener, final boolean isCompletedTasks) {
         DatabaseHelper.getInstance().getGroupKey(new DatabaseHelper.IGroupKeyListener() {
             @Override
             public void onGroupKey(String key) {
-                Query reference = FirebaseDatabase.getInstance().getReference(databasePath).child(key);
-                FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<MaintenanceTask,
-                        MaintenanceTaskHolder>(MaintenanceTask.class,
-                        R.layout.task_card, MaintenanceTaskHolder.class, reference) {
+                if (key != null) {
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(databasePath).child(key);
+                    FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<MaintenanceTask,
+                            MaintenanceTaskHolder>(MaintenanceTask.class,
+                            R.layout.task_card, MaintenanceTaskHolder.class, reference) {
 
-                    @Override
-                    protected void populateViewHolder(MaintenanceTaskHolder maintenanceTaskHolder,
-                                                      final MaintenanceTask maintenanceTask, final int i) {
-                        maintenanceTaskHolder.setCreatorId(maintenanceTask.getCreatorID());
-                        maintenanceTaskHolder.setDescription(maintenanceTask.getDescription());
-                        maintenanceTaskHolder.setName(maintenanceTask.getName());
-                        maintenanceTaskHolder.setTaskType(maintenanceTask.isTaskType());
-                        maintenanceTaskHolder.setAssignee(maintenanceTask.getAssignedTo());
-                        maintenanceTaskHolder.setLongClick(makeLongClick(maintenanceTask.getName(), i, this, activityContext));
-                    }
+                        @Override
+                        protected void populateViewHolder(MaintenanceTaskHolder maintenanceTaskHolder,
+                                                          final MaintenanceTask maintenanceTask,
+                                                          final int i) {
+                            maintenanceTaskHolder.setCreatorId(maintenanceTask.getCreatorID());
+                            maintenanceTaskHolder.setDescription(maintenanceTask.getDescription());
+                            maintenanceTaskHolder.setName(maintenanceTask.getName());
+                            maintenanceTaskHolder.setTaskType(maintenanceTask.isTaskType());
+                            maintenanceTaskHolder.setAssignee(maintenanceTask.getAssignedTo());
+                            if (!isCompletedTasks) {
+                                maintenanceTaskHolder.setLongClick(makeLongClick(maintenanceTask.getName(),
+                                        i, this, mContext));
+                            }
+                        }
 
-                    @Override
-                    protected void onDataChanged() {
-                        super.onDataChanged();
-                    }
+                        @Override
+                        protected void onDataChanged() {
+                            super.onDataChanged();
+                            listener.onRecyclerAdapter(this);
+                        }
 
-                };
-                listener.onRecyclerAdapter(adapter);
+                    };
+                }
             }
-
         });
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
     public interface IOnRecyclerAdapterListener {
         void onRecyclerAdapter(FirebaseRecyclerAdapter adapter);

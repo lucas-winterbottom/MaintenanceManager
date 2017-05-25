@@ -32,8 +32,14 @@ public class DatabaseHelper {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.child(currentUser).getValue(User.class);
-                if (user.getGroupKey() != null) {
-                    listener.onGroupKey(user.getGroupKey());
+                if (user != null) {
+                    if (user.getGroupKey() != null) {
+                        listener.onGroupKey(user.getGroupKey());
+                    } else {
+                        listener.onGroupKey(null);
+                    }
+                } else {
+                    listener.onGroupKey(null);
                 }
             }
 
@@ -99,7 +105,64 @@ public class DatabaseHelper {
                 });
             }
         });
+    }
 
+    public String getUserID() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+    /**
+     * Checks if the user already has data on the server if not, sets up the base user on the server
+     */
+    public void checkUserData() {
+        final DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference(Constants.USERS).child(getUserID());
+        dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if (user == null) {
+                    dataRef.setValue(new User(getDisplayName(), null, false));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
+    public String getDisplayName() {
+        return FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+    }
+
+    public void createGroup(Group group) {
+        group.getGroupMembers().add(getDisplayName());
+        group.setGroupCreator(getDisplayName());
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        String key = reference.child(Constants.GROUPS).push().getKey();
+        reference.child(Constants.GROUPS).child(key).setValue(group);
+        reference.child(Constants.USERS).child(getUserID()).child(Constants.GROUP_KEY).setValue(key);
+    }
+
+    public void joinExistingGroup(final String stringExtra) {
+        final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        reference.child(Constants.GROUPS).child(stringExtra).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Group group = dataSnapshot.getValue(Group.class);
+                group.getGroupMembers().add(DatabaseHelper.getInstance().getDisplayName());
+                reference.child(Constants.GROUPS).child(stringExtra).setValue(group);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+        reference.child(Constants.USERS).child(getUserID()).
+                child(Constants.GROUP_KEY).setValue(stringExtra);
     }
 
     public interface IGroupKeyListener {

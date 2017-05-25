@@ -2,6 +2,7 @@ package com.mad.maintenancemanager.model;
 
 import com.google.firebase.database.Exclude;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,12 @@ public class Group {
     private String mGroupName;
     private String mGroupCreator;
     private int mGroupKey;
-    private List<String> mGroupMembers;
+    private List<String> mGroupMembers = new ArrayList<>();
+
+    public Group(String groupName, int groupKey) {
+        mGroupName = groupName;
+        mGroupKey = groupKey;
+    }
 
     public Group(String groupName, String groupCreator, int groupKey, List<String> groupMembers) {
         mGroupName = groupName;

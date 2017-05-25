@@ -23,6 +23,15 @@
         android:layout_marginTop="@dimen/activity_vertical_margin">
 
     </android.support.v7.widget.RecyclerView>
+    <TextView
+        android:id="@+id/group_please_create_or_join_group_message_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="@string/please_create_or_join_group_using_the_buttons_below"
+        android:textSize="20sp"
+        android:visibility="gone"/>
 
     <com.github.clans.fab.FloatingActionMenu
         android:layout_width="wrap_content"

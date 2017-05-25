@@ -1,5 +1,6 @@
 package com.mad.maintenancemanager.useractivites;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -16,20 +17,14 @@ import com.firebase.ui.auth.ResultCodes;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
-import com.mad.maintenancemanager.adapter.MemberHolder;
+import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.model.Group;
-import com.mad.maintenancemanager.model.User;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.mad.maintenancemanager.presenter.GroupsPresenter;
+import com.mad.maintenancemanager.presenter.TasksPresenter;
 
 
 public class GroupFragment extends Fragment implements View.OnClickListener {
@@ -39,14 +34,24 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
     public static final String JOINING_CANCELLED = "Joining Cancelled";
     private DatabaseReference mRef;
     private FirebaseAuth mAuth;
-    private TextView mGroupName;
-    private FirebaseRecyclerAdapter<String, MemberHolder> mAdapter;
+    private TextView mNoGroupMessageTv;
     private RecyclerView mRecycler;
-    private FloatingActionButton mNewGroupTab,mAddMemberFab,mExistingGroupFab;
-
+    private FloatingActionButton mNewGroupTab, mAddMemberFab, mExistingGroupFab;
+    private INavUnlocker mUnlocker;
 
     public GroupFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mUnlocker = (INavUnlocker) context;
+        } catch (ClassCastException castException) {
+            /** The activity does not implement the listener. */
+        }
+
     }
 
     @Override
@@ -56,7 +61,7 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         View rootView = inflater.inflate(R.layout.fragment_group, container, false);
         mRef = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
-        mGroupName = (TextView) rootView.findViewById(R.id.group_group_name_tv);
+        mNoGroupMessageTv = (TextView) rootView.findViewById(R.id.group_please_create_or_join_group_message_tv);
         mRecycler = (RecyclerView) rootView.findViewById(R.id.group_group_recycler);
 
         //FAB Setup
@@ -66,30 +71,24 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         mExistingGroupFab.setOnClickListener(this);
         mAddMemberFab = (FloatingActionButton) rootView.findViewById(R.id.group_new_member);
         mAddMemberFab.setOnClickListener(this);
+        GroupsPresenter presenter = new GroupsPresenter();
+        presenter.getGroupRecycler(new TasksPresenter.IOnRecyclerAdapterListener() {
+            @Override
+            public void onRecyclerAdapter(FirebaseRecyclerAdapter adapter) {
+                if (adapter != null) {
+                    alternateFabs();
+                    mRecycler.setHasFixedSize(false);
+                    mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+                    mRecycler.setAdapter(adapter);
+                } else {
+                    mNoGroupMessageTv.setVisibility(View.VISIBLE);
+                }
 
-        getGroupKey();
-
-
+            }
+        });
         return rootView;
     }
 
-    private void getGroupKey() {
-        DatabaseReference userInfo = FirebaseDatabase.getInstance().getReference(Constants.USERS);
-        userInfo.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.child(mAuth.getCurrentUser().getUid()).getValue(User.class);
-                if (user.getGroupKey() != null) {
-                    alternateFabs();
-                    getGroup(user.getGroupKey());
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // ...
-            }
-        });
-    }
 
     private void alternateFabs() {
         mExistingGroupFab.setVisibility(View.GONE);
@@ -112,96 +111,41 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         //// TODO: 20/5/17 Add method to invite user.
     }
 
-    public void getGroup(final String groupKey) {
-
-        DatabaseReference group = FirebaseDatabase.getInstance().getReference(Constants.GROUPS);
-        group.addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Group group = dataSnapshot.child(groupKey).getValue(Group.class);
-                mGroupName.setText(group.getGroupName());
-                setUpRecycler(groupKey, group.getGroupCreator());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void setUpRecycler(String groupKey, final String creatorID) {
-        DatabaseReference group = FirebaseDatabase.getInstance().getReference(Constants.GROUPS).child(groupKey).child(Constants.GROUP_MEMBERS);
-        mRecycler.setHasFixedSize(false);
-        mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new FirebaseRecyclerAdapter<String, MemberHolder>(String.class, R.layout.name_card, MemberHolder.class, group) {
-
-            @Override
-            protected void onDataChanged() {
-                super.onDataChanged();
-            }
-
-            @Override
-            protected void populateViewHolder(MemberHolder memberHolder, String s, int i) {
-                memberHolder.setMemberName(s);
-                if (creatorID.equals(mAuth.getCurrentUser().getDisplayName()) && i > 0) {
-                    memberHolder.setDeleteBtn(true);
-                } else if (creatorID.equals(mAuth.getCurrentUser().getDisplayName()) && i == 0) {
-                    memberHolder.setColour(R.color.colorAccent);
-                }
-
-            }
-        };
-        mRecycler.setAdapter(mAdapter);
+    public void refreshFragment() {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.detach(this).attach(this).commit();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        final FirebaseUser user = mAuth.getCurrentUser();
-        // RC_SIGN_IN is the request code you passed into startActivityForResult(...) when starting the sign in flow.
         if (requestCode == REQUEST_CODE) {
             if (resultCode == ResultCodes.OK) {
                 String groupName = data.getStringExtra(Constants.GROUP_NAME);
                 String groupPin = data.getStringExtra(Constants.GROUP_PIN);
-
-                List<String> userList = new ArrayList<>();
-                userList.add(user.getDisplayName());
-                Group group = new Group(groupName, user.getDisplayName(), Integer.parseInt(groupPin), userList);
-                String key = mRef.child(Constants.GROUPS).push().getKey();
-                mRef.child(Constants.GROUPS).child(key).setValue(group);
-                mRef.child(Constants.USERS).child(user.getUid()).child(Constants.GROUP_KEY).setValue(key);
+                DatabaseHelper.getInstance().createGroup(new Group(groupName, Integer.parseInt(groupPin)));
+                mUnlocker.unlockNavDrawer();
             } else {
                 Snackbar.make(getView(), R.string.creation_cancelled, Snackbar.LENGTH_SHORT).show();
             }
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.detach(this).attach(this).commit();
+            refreshFragment();
         }
         if (requestCode == REQUEST_CODE1) {
             if (resultCode == ResultCodes.OK) {
+                //// TODO: 24/5/17 check if the group exist and the key matches if not send correct error message
+                DatabaseHelper.getInstance().joinExistingGroup(data.getStringExtra(Constants.GROUP_KEY));
                 final String groupKey = data.getStringExtra(Constants.GROUP_KEY);
-                mRef.child(Constants.GROUPS).child(groupKey).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Group group = dataSnapshot.getValue(Group.class);
-                        group.getGroupMembers().add(user.getDisplayName());
-                        mRef.child(Constants.GROUPS).child(groupKey).setValue(group);
-                    }
+                mUnlocker.unlockNavDrawer();
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-                mRef.child(Constants.USERS).child(user.getUid()).child(Constants.GROUP_KEY).setValue(groupKey);
             } else {
                 Snackbar.make(getView(), JOINING_CANCELLED, Snackbar.LENGTH_SHORT).show();
-
             }
 
         }
     }
 
+    public interface INavUnlocker {
+        void unlockNavDrawer();
+    }
 
 }

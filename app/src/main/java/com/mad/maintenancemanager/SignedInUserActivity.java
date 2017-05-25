@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,22 +28,25 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.model.User;
+import com.mad.maintenancemanager.useractivites.CompletedTasksFragment;
 import com.mad.maintenancemanager.useractivites.GroupFragment;
 import com.mad.maintenancemanager.useractivites.GroupTasks;
 import com.mad.maintenancemanager.useractivites.MyTasks;
 import com.squareup.picasso.Picasso;
+
+import layout.SplashFragment;
 
 /**
  * Activity that is the basis for a user that is signed in and has a navigation drawer
  * to navigate between fragments
  */
 public class SignedInUserActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,GroupFragment.INavUnlocker {
 
     private FirebaseAuth mAuth;
     private TextView mEmailTv;
-    private FirebaseAuth.AuthStateListener mAuthListener;
     private TextView mNameTV;
     private ImageView mUserImage;
     protected NavigationView navigationView;
@@ -52,6 +57,12 @@ public class SignedInUserActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signed_in_user);
+
+        //Firebase Stuff
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+
+
         //My Stuff
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -62,13 +73,26 @@ public class SignedInUserActivity extends AppCompatActivity
         mDrawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        splashScreen();
+
+        //// TODO: 24/5/17 Make this cater for trade view
+        DatabaseHelper.getInstance().checkUserData();
+        DatabaseHelper.getInstance().getGroupKey(new DatabaseHelper.IGroupKeyListener() {
+            @Override
+            public void onGroupKey(String key) {
+                if(key!=null){
+                    unlockNavDrawer();
+                    onNavigationItemSelected(navigationView.getMenu().getItem(0));
+                }
+                else {
+                    onNavigationItemSelected(navigationView.getMenu().getItem(3));
+                }
+            }
+        });
+
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        onNavigationItemSelected(navigationView.getMenu().getItem(0));
 
-        //Firebase Stuff
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
 
         //Populate navigation drawer with user data
         mEmailTv = (TextView) navigationView.getHeaderView(0).
@@ -83,53 +107,16 @@ public class SignedInUserActivity extends AppCompatActivity
                 findViewById(R.id.signed_in_user_image);
         Picasso.with(SignedInUserActivity.this).load(mUser.getPhotoUrl()).
                 into(mUserImage);
-        checkUserData(mUser.getUid(), mUser.getDisplayName());
 
-        mAuthListener = new FirebaseAuth.AuthStateListener()
-
-        {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(Constants.FIREBASE, "onAuthStateChanged:signed_in:" + user.getUid());
-
-                } else {
-                    // User is signed out
-                    Log.d(Constants.FIREBASE, "onAuthStateChanged:signed_out");
-
-                }
-            }
-        };
 
     }
 
-
-    /**
-     * Checks if the user already has data on the server if not, sets up the base user on the server
-     *
-     * @param currentUserID The currently signed in users ID
-     * @param displayName   The Currently signed in users Display Name
-     */
-    private void checkUserData(final String currentUserID, final String displayName) {
-        final DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference(Constants.USERS).child(currentUserID);
-        dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if (user == null) {
-                    dataRef.setValue(new User(displayName, null, false));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
+    private void splashScreen(){
+        Fragment fragment = new SplashFragment();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(android.R.anim.fade_in,android.R.anim.fade_out);
+        ft.replace(R.id.frame_layout, fragment).commit();
+        lockNavDrawer();
     }
 
     @Override
@@ -162,6 +149,14 @@ public class SignedInUserActivity extends AppCompatActivity
         return true;
     }
 
+    private void lockNavDrawer(){
+        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+    }
+
+    public void unlockNavDrawer(){
+        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+    }
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -175,7 +170,7 @@ public class SignedInUserActivity extends AppCompatActivity
             } else if (id == R.id.nav_group_tasks) {
                 fragment = new GroupTasks();
             } else if (id == R.id.nav_completed_tasks) {
-
+                fragment = new CompletedTasksFragment();
             } else if (id == R.id.nav_group) {
                 fragment = new GroupFragment();
             } else if (id == R.id.nav_account_settings) {
@@ -185,8 +180,9 @@ public class SignedInUserActivity extends AppCompatActivity
                 startActivity(new Intent(SignedInUserActivity.this, LoginActivity.class));
                 finish();
             }
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, fragment).commit();
-
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.setCustomAnimations(android.R.anim.fade_in,android.R.anim.fade_out);
+            ft.replace(R.id.frame_layout, fragment).commit();
             // update selected item and title, then close the drawer
             item.setChecked(true);
             getSupportActionBar().setTitle(item.getTitle());
@@ -197,3 +193,4 @@ public class SignedInUserActivity extends AppCompatActivity
     }
 
 }
+

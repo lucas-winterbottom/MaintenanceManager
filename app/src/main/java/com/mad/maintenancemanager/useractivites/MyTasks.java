@@ -41,14 +41,16 @@ public class MyTasks extends Fragment {
         mRecycler.setHasFixedSize(false);
         mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        TasksPresenter presenter = new TasksPresenter();
+        TasksPresenter presenter = new TasksPresenter(getActivity());
         presenter.getRecyclerAdapter(Constants.TASKS_ACTIVE_TASKS, new TasksPresenter.IOnRecyclerAdapterListener() {
             @Override
             public void onRecyclerAdapter(FirebaseRecyclerAdapter adapter) {
-                mRecycler.setAdapter(adapter);
-                hideProgress();
+                if(adapter!=null){
+                    mRecycler.setAdapter(adapter);
+                    hideProgress();
+                }
             }
-        },getActivity());
+        },false);
 
         return rootView;
     }

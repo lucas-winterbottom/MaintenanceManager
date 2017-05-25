@@ -130,6 +130,9 @@
     <string name="assigned_to_">Assigned to:</string>
     <string name="you_are_not_part_of_a_group_n_please_join_a_group">You are not part of a group,   Please join a group</string>
     <string name="no_tasks_are_assigned_to_you">No tasks are assigned to you</string>
+    <string name="no_tasks_have_been_completed_by_your_group">No tasks have been completed by your group</string>
+    <string name="please_create_or_join_group_using_the_buttons_below">Please create or join Group using the button below</string>
+    <string name="loading">Loading...</string>
     <string-array name="contractor_array">
         <item>Electrician</item>
         <item>Plumber</item>
