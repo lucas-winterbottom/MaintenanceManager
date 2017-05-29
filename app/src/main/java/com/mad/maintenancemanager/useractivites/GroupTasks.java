@@ -1,35 +1,30 @@
 package com.mad.maintenancemanager.useractivites;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.ResultCodes;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.Query;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
 import com.mad.maintenancemanager.adapter.MaintenanceTaskHolder;
 import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.model.MaintenanceTask;
-import com.mad.maintenancemanager.model.User;
 import com.mad.maintenancemanager.presenter.TasksPresenter;
-
-import java.util.Date;
 
 /**
  * Fragment that shows the user the tasks for the group they are currently in, gathers the users
@@ -43,6 +38,8 @@ public class GroupTasks extends Fragment {
     private DatabaseReference mTaskRef;
     private RecyclerView mRecycler;
     private FirebaseRecyclerAdapter<MaintenanceTask, MaintenanceTaskHolder> mAdapter;
+    private Query mRef;
+    private ProgressBar mProgress;
 
     /**
      * Empty constructor for fragment use
@@ -56,10 +53,11 @@ public class GroupTasks extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_group_tasks, container, false);
 
-
         mRecycler = (RecyclerView) rootView.findViewById(R.id.group_tasks_recycler);
         mRecycler.setHasFixedSize(false);
         mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        mProgress = (ProgressBar) rootView.findViewById(R.id.group_tasks_progress);
+
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.group_tasks_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,18 +66,22 @@ public class GroupTasks extends Fragment {
                 startActivityForResult(intent, REQUEST_CODE);
             }
         });
+        mRef = DatabaseHelper.getInstance().getGroupTasksRef();
         TasksPresenter presenter = new TasksPresenter(getActivity());
-        presenter.getRecyclerAdapter(Constants.TASKS_ACTIVE_TASKS, new TasksPresenter.IOnRecyclerAdapterListener() {
+        presenter.getTasksRecyclerAdapter(mRef, new TasksPresenter.IOnRecyclerAdapterListener() {
             @Override
             public void onRecyclerAdapter(FirebaseRecyclerAdapter adapter) {
                 mRecycler.setAdapter(adapter);
-                //hideProgress();
+                hideProgress();
             }
         }, false);
 
         return rootView;
     }
 
+    private void hideProgress() {
+        mProgress.setVisibility(View.GONE);
+    }
 
     /**
      * Handles the feedback from the NewTaskActivity
@@ -89,15 +91,12 @@ public class GroupTasks extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE) {
             if (resultCode == ResultCodes.OK) {
-                if (data.getBooleanExtra(Constants.CONTRACTOR_NEEDED, false)) {
-
+                Gson gson = new GsonBuilder().create();
+                MaintenanceTask task = gson.fromJson(data.getStringExtra(Constants.TASKS),
+                        MaintenanceTask.class);
+                if (task.isTaskType()) {
                 } else {
-                    DatabaseHelper.getInstance().saveTask(new MaintenanceTask(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
-                            data.getStringExtra(Constants.TASK_NAME),
-                            data.getStringExtra(Constants.TASK_DESCRIPTION),
-                            data.getStringExtra(Constants.ASSIGNED_MEMBER),
-                            data.getStringExtra(Constants.TASK_ITEMS),
-                            (Date) data.getSerializableExtra(Constants.DUE_DATE)));
+                    DatabaseHelper.getInstance().saveTask(task);
                 }
             }
         }

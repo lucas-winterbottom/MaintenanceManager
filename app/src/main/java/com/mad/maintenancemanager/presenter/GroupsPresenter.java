@@ -16,33 +16,27 @@ import com.mad.maintenancemanager.api.DatabaseHelper;
 
 public class GroupsPresenter {
 
-    public void getGroupRecycler(final TasksPresenter.IOnRecyclerAdapterListener listener){
-        DatabaseHelper.getInstance().getGroupKey(new DatabaseHelper.IGroupKeyListener() {
-            @Override
-            public void onGroupKey(String key) {
-                if(key!= null){
-                    DatabaseReference group = FirebaseDatabase.getInstance().getReference(Constants.GROUPS).child(key).child(Constants.GROUP_MEMBERS);
-                    FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<String, MemberHolder>(String.class,
-                            R.layout.name_card, MemberHolder.class, group) {
+    public void getGroupRecycler(final TasksPresenter.IOnRecyclerAdapterListener listener) {
+        String key = DatabaseHelper.getInstance().getGroupKey();
+        if (key != null) {
+            DatabaseReference group = FirebaseDatabase.getInstance().getReference(Constants.GROUPS).child(key).child(Constants.GROUP_MEMBERS);
+            FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<String, MemberHolder>(String.class,
+                    R.layout.name_card, MemberHolder.class, group) {
 
-                        @Override
-                        protected void onDataChanged() {
-                            super.onDataChanged();
-                        }
-
-                        @Override
-                        protected void populateViewHolder(MemberHolder memberHolder, String s, int i) {
-                            memberHolder.setMemberName(s);
-                        }
-                    };
-                    listener.onRecyclerAdapter(adapter);
+                @Override
+                protected void onDataChanged() {
+                    super.onDataChanged();
                 }
-                else {
-                    listener.onRecyclerAdapter(null);
-                }
-            }
-        });
 
+                @Override
+                protected void populateViewHolder(MemberHolder memberHolder, String s, int i) {
+                    memberHolder.setMemberName(s);
+                }
+            };
+            listener.onRecyclerAdapter(adapter);
+        } else {
+            listener.onRecyclerAdapter(null);
+        }
     }
 
 }

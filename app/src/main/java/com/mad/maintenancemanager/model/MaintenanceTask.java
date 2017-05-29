@@ -2,7 +2,7 @@ package com.mad.maintenancemanager.model;
 
 import com.google.android.gms.location.places.Place;
 
-import java.util.Date;
+import org.threeten.bp.LocalDate;
 
 /**
  * Created by lucaswinterbottom on 14/5/17.
@@ -16,25 +16,28 @@ public class MaintenanceTask {
     private String mAssignedTo;
     private String mNeededItems;
     //private URL mImageURL;
-    private String mDueDate;
+    private long mDueDate;
     private String mTradeType;
     private Place mTaskLocation;
 
 
-    public MaintenanceTask(String creatorID, String name, String description, String assignedTo, String neededItems, Date dueDate) {
+    public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, String neededItems, long dueDate, String tradeType, Place taskLocation) {
         mCreatorID = creatorID;
         mName = name;
         mDescription = description;
+        mTaskType = taskType;
         mAssignedTo = assignedTo;
         mNeededItems = neededItems;
-        mDueDate = dueDate.toString();
+        mDueDate = dueDate;
+        mTradeType = tradeType;
+        mTaskLocation = taskLocation;
     }
 
-    public String getDueDate() {
+    public long getDueDate() {
         return mDueDate;
     }
 
-    public void setDueDate(String dueDate) {
+    public void setDueDate(int dueDate) {
         mDueDate = dueDate;
     }
 

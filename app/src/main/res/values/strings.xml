@@ -135,6 +135,10 @@
     <string name="search_for_your_location">Search and add your location</string>
     <string name="select_contractor_type">Select Contractor Type</string>
     <string name="task_due_date">Task Due Date</string>
+    <string name="due_today">Due Today</string>
+    <string name="days_remaining">\u0020days remaining</string>
+    <string name="due_tomorrow">Due tomorrow</string>
+    <string name="days_overdue">\u0020days overdue</string>
     <string-array name="contractor_array">
         <item>Electrician</item>
         <item>Plumber</item>

@@ -53,7 +53,7 @@
         fab:menu_colorNormal="@color/colorAccent">
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/group_existing_group"
+            android:id="@+id/group_existing_group_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_label="@string/join_e_group"
@@ -62,7 +62,7 @@
             />
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/group_new_group"
+            android:id="@+id/group_new_group_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_label="@string/create_n_group"
@@ -70,7 +70,7 @@
             fab:menu_colorNormal="@color/colorAccent"
             />
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/group_new_member"
+            android:id="@+id/group_new_member_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_label="Invite new Member"

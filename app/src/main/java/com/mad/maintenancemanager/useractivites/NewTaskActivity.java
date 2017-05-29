@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.JsonWriter;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -13,7 +12,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 
@@ -27,8 +25,11 @@ import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
 import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.model.Group;
+import com.mad.maintenancemanager.model.MaintenanceTask;
+import com.mad.maintenancemanager.presenter.NewTasksPresenter;
 
-import java.lang.reflect.Type;
+import org.threeten.bp.LocalDate;
+
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.List;
@@ -45,7 +46,7 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
     private LinearLayout mContractorInfo;
     private Place mPlace;
     private int mDay, mMonth, mYear;
-    private Date mDueDate;
+    private LocalDate mDueDate;
 
 
     @Override
@@ -130,26 +131,28 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         Intent result = new Intent();
-        result.putExtra(Constants.TASK_NAME, mTaskNameEt.getText().toString());
-        result.putExtra(Constants.TASK_DESCRIPTION, mTaskDescriptionEt.getText().toString());
-        result.putExtra(Constants.TASK_ITEMS, mTaskExtraItemsEt.getText().toString());
-        result.putExtra(Constants.ASSIGNED_MEMBER, mGroupMemberSpinner.getSelectedItem().toString());
-        result.putExtra(Constants.CONTRACTOR_NEEDED, mContractorSwitch.isChecked());
-        result.putExtra(Constants.DUE_DATE,mDueDate);
-        if (mContractorSwitch.isChecked()) {
-            Gson gson = new GsonBuilder().create();
-            String stringPlace = gson.toJson(mPlace, String.class);
-            result.putExtra(Constants.TASK_LOCATION, stringPlace);
-            result.putExtra(Constants.CONTRACTOR_TYPE, mContractorSpinner.getSelectedItem().toString());
-        }
+        MaintenanceTask task = new MaintenanceTask(DatabaseHelper.getInstance().getDisplayName(),
+                mTaskNameEt.getText().toString(),
+                mTaskDescriptionEt.getText().toString(),
+                mContractorSwitch.isChecked(),
+                mGroupMemberSpinner.getSelectedItem().toString(),
+                mTaskExtraItemsEt.getText().toString(),
+                mDueDate.toEpochDay(),
+                mContractorSpinner.getSelectedItem().toString(),
+                mPlace
+        );
+        Gson gson = new GsonBuilder().create();
+        String stringTask = gson.toJson(task, MaintenanceTask.class);
+        result.putExtra(Constants.TASKS, stringTask);
         setResult(RESULT_OK, result);
         finish();
     }
 
-    private String contructDate(int selectedYear, int selectedMonth, int selectedDay) {
-        return selectedYear + "-" + selectedMonth + "-" + selectedDay;
+    private String constructDate(int selectedYear, int selectedMonth, int selectedDay) {
+        return Date.valueOf(selectedYear + "-" + selectedMonth + "-" + selectedDay).toString();
     }
 
+    //// TODO: 29/5/17 Consider moving to presenter same with setups
     public void showDatePicker(View view) {
         //To show current date in the datepicker
         Calendar mCurrentDate = Calendar.getInstance();
@@ -160,8 +163,8 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
         DatePickerDialog mDatePicker = new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
             public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
                 // TODO Auto-generated method stub
-                String date = contructDate(selectedYear, selectedMonth, selectedDay);
-                mDueDate = Date.valueOf(date);
+                String date = constructDate(selectedYear, selectedMonth + 1, selectedDay);
+                mDueDate = LocalDate.parse(date);
                 mTaskDueDateEt.setText(date);
                     /*      Your code   to get date and time    */
             }

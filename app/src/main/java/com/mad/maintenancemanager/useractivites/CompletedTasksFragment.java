@@ -9,11 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.Query;
 import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
+import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.presenter.TasksPresenter;
 
 public class CompletedTasksFragment extends Fragment {
@@ -34,8 +35,9 @@ public class CompletedTasksFragment extends Fragment {
         mNoCompletionText = (TextView) rootView.findViewById(R.id.no_completed_task_message);
         mRecycler.setHasFixedSize(false);
         mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        Query ref = DatabaseHelper.getInstance().getCompletedTasksRef();
         TasksPresenter presenter = new TasksPresenter(getContext());
-        presenter.getRecyclerAdapter(Constants.TASKS_COMPLETED_TASKS, new TasksPresenter.IOnRecyclerAdapterListener() {
+        presenter.getTasksRecyclerAdapter(ref, new TasksPresenter.IOnRecyclerAdapterListener() {
             @Override
             public void onRecyclerAdapter(FirebaseRecyclerAdapter adapter) {
                 mRecycler.setAdapter(adapter);

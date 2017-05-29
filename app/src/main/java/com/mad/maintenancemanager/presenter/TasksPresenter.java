@@ -4,25 +4,20 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.widget.Switch;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.jakewharton.threetenabp.AndroidThreeTen;
+import com.google.firebase.database.Query;
+import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
 import com.mad.maintenancemanager.adapter.MaintenanceTaskHolder;
 import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.model.MaintenanceTask;
 
-import org.threeten.bp.Duration;
 import org.threeten.bp.LocalDate;
-import org.threeten.bp.Period;
-import org.threeten.bp.temporal.Temporal;
-
-import java.sql.Date;
-import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
+import org.threeten.bp.temporal.ChronoUnit;
 
 /**
  * Created by lucaswinterbottom on 22/5/17.
@@ -40,70 +35,67 @@ public class TasksPresenter {
     /**
      * Gets the user data from Firebase and then extracts the group key to setup recycler
      */
+    public void getTasksRecyclerAdapter(final Query databasePath,
+                                        final IOnRecyclerAdapterListener listener,
+                                        final boolean isCompletedTasks) {
+        adapter = new FirebaseRecyclerAdapter<MaintenanceTask,
+                MaintenanceTaskHolder>(MaintenanceTask.class,
+                R.layout.task_card, MaintenanceTaskHolder.class,
+                databasePath) {
 
-    public void getRecyclerAdapter(final String databasePath, final IOnRecyclerAdapterListener listener, final boolean isCompletedTasks) {
-        DatabaseHelper.getInstance().getGroupKey(new DatabaseHelper.IGroupKeyListener() {
             @Override
-            public void onGroupKey(String key) {
-                if (key != null) {
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(databasePath).child(key);
-                    adapter = new FirebaseRecyclerAdapter<MaintenanceTask,
-                            MaintenanceTaskHolder>(MaintenanceTask.class,
-                            R.layout.task_card, MaintenanceTaskHolder.class, reference) {
-
+            protected void populateViewHolder(MaintenanceTaskHolder maintenanceTaskHolder,
+                                              final MaintenanceTask maintenanceTask,
+                                              final int i) {
+                maintenanceTaskHolder.setDescription(maintenanceTask.getDescription());
+                maintenanceTaskHolder.setName(maintenanceTask.getName());
+                maintenanceTaskHolder.setTaskType(maintenanceTask.isTaskType());
+                maintenanceTaskHolder.setAssignee(mContext.getString(R.string.assigned_to_)
+                        + maintenanceTask.getAssignedTo());
+                maintenanceTaskHolder.setDueDate(calculateDays(maintenanceTask.getDueDate()));
+                maintenanceTaskHolder.setItems(maintenanceTask.getNeededItems());
+                if (!isCompletedTasks) {
+                    maintenanceTaskHolder.setLongClick(new View.OnLongClickListener() {
                         @Override
-                        protected void populateViewHolder(MaintenanceTaskHolder maintenanceTaskHolder,
-                                                          final MaintenanceTask maintenanceTask,
-                                                          final int i) {
-                            maintenanceTaskHolder.setDescription(maintenanceTask.getDescription());
-                            maintenanceTaskHolder.setName(maintenanceTask.getName());
-                            maintenanceTaskHolder.setTaskType(maintenanceTask.isTaskType());
-                            maintenanceTaskHolder.setAssignee(mContext.getString(R.string.assigned_to_)
-                                    + maintenanceTask.getAssignedTo());
-                            maintenanceTaskHolder.setDueDate(calculateDays(maintenanceTask.getDueDate()));
-
-                            maintenanceTaskHolder.setItems(maintenanceTask.getNeededItems());
-                            if (!isCompletedTasks) {
-                                maintenanceTaskHolder.setLongClick(new View.OnLongClickListener() {
-                                    @Override
-                                    public boolean onLongClick(View v) {
-                                        makeLongClick(maintenanceTask.getName(), i, adapter, mContext);
-                                        return true;
-                                    }
-                                });
-                                maintenanceTaskHolder.setClick();
-                            }
+                        public boolean onLongClick(View v) {
+                            makeLongClick(maintenanceTask.getName(), i, adapter, mContext);
+                            return true;
                         }
-
-                        @Override
-                        protected void onDataChanged() {
-                            super.onDataChanged();
-                            listener.onRecyclerAdapter(this);
-                        }
-
-                    };
+                    });
+                    maintenanceTaskHolder.setClick();
                 }
             }
-        });
+
+            @Override
+            protected void onDataChanged() {
+                super.onDataChanged();
+                listener.onRecyclerAdapter(this);
+            }
+
+        };
     }
 
 
     public interface IOnRecyclerAdapterListener {
         void onRecyclerAdapter(FirebaseRecyclerAdapter adapter);
+
     }
 
-    private String calculateDays(String date) {
+    private String calculateDays(long date) {
         String daysText;
-        LocalDate dueDate = LocalDate.parse(date);
+        LocalDate dueDate = LocalDate.ofEpochDay(date);
         LocalDate today = LocalDate.now();
-        Period period = Period.between(dueDate, today);
-        if (period.getDays() == 0) {
-            return "Today";
+        long days = ChronoUnit.DAYS.between(today, dueDate);
+        if (days == 0) {
+            return mContext.getString(R.string.due_today);
+        } else if (days > 1) {
+            return String.valueOf(days) + mContext.getString(R.string.days_remaining);
+        } else if (days == 1) {
+            return mContext.getString(R.string.due_tomorrow);
+        } else {
+            days = Math.abs(days);
+            return days + mContext.getString(R.string.days_overdue);
         }
-
-
-        daysText = String.valueOf(period.getDays());
-        return daysText;
     }
 
     private void makeLongClick(final String taskName, final int position

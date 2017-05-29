@@ -2,6 +2,7 @@ package com.mad.maintenancemanager.useractivites;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -16,9 +17,6 @@ import android.widget.TextView;
 import com.firebase.ui.auth.ResultCodes;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.clans.fab.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
 import com.mad.maintenancemanager.api.DatabaseHelper;
@@ -32,7 +30,7 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
     public static final int REQUEST_CODE = 123;
     public static final int REQUEST_CODE1 = 1234;
     public static final String JOINING_CANCELLED = "Joining Cancelled";
-    private TextView mNoGroupMessageTv,mGroupNameTV, mGroupMembersTV;
+    private TextView mNoGroupMessageTv, mGroupNameTV, mGroupMembersTV;
     private RecyclerView mRecycler;
     private FloatingActionButton mNewGroupTab, mAddMemberFab, mExistingGroupFab;
     private INavUnlocker mUnlocker;
@@ -63,11 +61,11 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         mGroupMembersTV = (TextView) rootView.findViewById(R.id.group_group_members_tv);
 
         //FAB Setup
-        mNewGroupTab = (FloatingActionButton) rootView.findViewById(R.id.group_new_group);
+        mNewGroupTab = (FloatingActionButton) rootView.findViewById(R.id.group_new_group_fab);
         mNewGroupTab.setOnClickListener(this);
-        mExistingGroupFab = (FloatingActionButton) rootView.findViewById(R.id.group_existing_group);
+        mExistingGroupFab = (FloatingActionButton) rootView.findViewById(R.id.group_existing_group_fab);
         mExistingGroupFab.setOnClickListener(this);
-        mAddMemberFab = (FloatingActionButton) rootView.findViewById(R.id.group_new_member);
+        mAddMemberFab = (FloatingActionButton) rootView.findViewById(R.id.group_new_member_fab);
         mAddMemberFab.setOnClickListener(this);
 
 
@@ -107,13 +105,22 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.group_new_group) {
+        if (id == R.id.group_new_group_fab) {
             Intent intent = new Intent(getContext(), NewGroupActivity.class);
             startActivityForResult(intent, REQUEST_CODE);
         }
-        if (id == R.id.group_existing_group) {
+        if (id == R.id.group_existing_group_fab) {
             Intent intent2 = new Intent(getContext(), JoinExisting.class);
             startActivityForResult(intent2, REQUEST_CODE1);
+        }
+        if (id == R.id.group_new_member_fab) {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            String message = "Join my group on Maintenance Manager.\n" +
+                    "Group Code: " + DatabaseHelper.getInstance().getGroupKey();
+            intent.putExtra(Intent.EXTRA_TEXT, message);
+            startActivity(intent);
+
         }
 
         //// TODO: 20/5/17 Add method to invite user.
@@ -143,6 +150,12 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
             if (resultCode == ResultCodes.OK) {
                 //// TODO: 24/5/17 check if the group exist and the key matches if not send correct error message
                 DatabaseHelper.getInstance().joinExistingGroup(data.getStringExtra(Constants.GROUP_KEY));
+                DatabaseHelper.getInstance().setGroupKey(new DatabaseHelper.IGroupKeyListener() {
+                    @Override
+                    public void onGroupKey(String key) {
+                        refreshFragment();
+                    }
+                });
                 mUnlocker.unlockNavDrawer();
             } else {
                 Snackbar.make(getView(), JOINING_CANCELLED, Snackbar.LENGTH_SHORT).show();

@@ -35,7 +35,7 @@ import com.mad.maintenancemanager.useractivites.SplashFragment;
  * to navigate between fragments
  */
 public class SignedInUserActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,GroupFragment.INavUnlocker {
+        implements NavigationView.OnNavigationItemSelectedListener, GroupFragment.INavUnlocker {
 
     private FirebaseAuth mAuth;
     private TextView mEmailTv;
@@ -72,14 +72,13 @@ public class SignedInUserActivity extends AppCompatActivity
 
         //// TODO: 24/5/17 Make this cater for trade view
         DatabaseHelper.getInstance().checkUserData();
-        DatabaseHelper.getInstance().getGroupKey(new DatabaseHelper.IGroupKeyListener() {
+        DatabaseHelper.getInstance().setGroupKey(new DatabaseHelper.IGroupKeyListener() {
             @Override
             public void onGroupKey(String key) {
-                if(key!=null){
+                if (key != null) {
                     unlockNavDrawer();
                     onNavigationItemSelected(navigationView.getMenu().getItem(0));
-                }
-                else {
+                } else {
                     onNavigationItemSelected(navigationView.getMenu().getItem(3));
                 }
             }
@@ -106,10 +105,10 @@ public class SignedInUserActivity extends AppCompatActivity
 
     }
 
-    private void splashScreen(){
+    private void splashScreen() {
         Fragment fragment = new SplashFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.setCustomAnimations(android.R.anim.fade_in,android.R.anim.fade_out);
+        ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         ft.replace(R.id.frame_layout, fragment).commit();
         lockNavDrawer();
     }
@@ -144,11 +143,11 @@ public class SignedInUserActivity extends AppCompatActivity
         return true;
     }
 
-    private void lockNavDrawer(){
+    private void lockNavDrawer() {
         mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
-    public void unlockNavDrawer(){
+    public void unlockNavDrawer() {
         mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
@@ -172,11 +171,12 @@ public class SignedInUserActivity extends AppCompatActivity
 
             } else if (id == R.id.nav_sign_out) {
                 mAuth.signOut();
+                DatabaseHelper.getInstance().userLogout();
                 startActivity(new Intent(SignedInUserActivity.this, LoginActivity.class));
                 finish();
             }
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.setCustomAnimations(android.R.anim.fade_in,android.R.anim.fade_out);
+            ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
             ft.replace(R.id.frame_layout, fragment).commit();
             // update selected item and title, then close the drawer
             item.setChecked(true);

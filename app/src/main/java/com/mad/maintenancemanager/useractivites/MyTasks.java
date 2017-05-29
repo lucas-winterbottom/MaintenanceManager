@@ -11,8 +11,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
+import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.presenter.TasksPresenter;
 
 /**
@@ -44,15 +47,20 @@ public class MyTasks extends Fragment {
         mRecycler.setHasFixedSize(false);
         mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        Query ref = DatabaseHelper.getInstance().getMyTasksRef();
         TasksPresenter presenter = new TasksPresenter(getActivity());
-        presenter.getRecyclerAdapter(Constants.TASKS_ACTIVE_TASKS, new TasksPresenter.IOnRecyclerAdapterListener() {
+        presenter.getTasksRecyclerAdapter(ref, new TasksPresenter.IOnRecyclerAdapterListener() {
             @Override
             public void onRecyclerAdapter(FirebaseRecyclerAdapter adapter) {
                 mRecycler.setAdapter(adapter);
                 hideProgress();
                 if (adapter.getItemCount() == 0) {
                     mNoTasksMessageTv.setVisibility(View.VISIBLE);
+                } else {
+                    mNoTasksMessageTv.setVisibility(View.GONE);
+
                 }
+
             }
         }, false);
 
