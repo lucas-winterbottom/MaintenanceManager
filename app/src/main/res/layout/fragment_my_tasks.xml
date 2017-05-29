@@ -20,15 +20,6 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"/>
 
-    <TextView
-        android:id="@+id/no_group_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/you_are_not_part_of_a_group_n_please_join_a_group"
-        android:textSize="20sp"
-        android:gravity="center"
-        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/no_task_message"

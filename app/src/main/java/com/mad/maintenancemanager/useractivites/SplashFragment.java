@@ -1,4 +1,4 @@
-package layout;
+package com.mad.maintenancemanager.useractivites;
 
 import android.content.Context;
 import android.net.Uri;

@@ -100,7 +100,6 @@
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
 
-    <!-- Example settings for Notifications -->
     <string name="pref_header_notifications">Notifications</string>
 
     <string name="pref_title_new_message_notifications">New message notifications</string>
@@ -110,7 +109,6 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="create_n_group">Create New Group</string>
     <string name="join_e_group">Join Existing Group</string>
@@ -127,12 +125,16 @@
     <string name="requires_contractor_assistance">Requires Contractor Assistance ?</string>
     <string name="assign_to">Assign to</string>
     <string name="assigned_to">Assigned to</string>
-    <string name="assigned_to_">Assigned to:</string>
+    <string name="assigned_to_">Assigned to:\u0020</string>
     <string name="you_are_not_part_of_a_group_n_please_join_a_group">You are not part of a group,   Please join a group</string>
     <string name="no_tasks_are_assigned_to_you">No tasks are assigned to you</string>
     <string name="no_tasks_have_been_completed_by_your_group">No tasks have been completed by your group</string>
     <string name="please_create_or_join_group_using_the_buttons_below">Please create or join Group using the button below</string>
     <string name="loading">Loading...</string>
+    <string name="members">Members:\u0020</string>
+    <string name="search_for_your_location">Search and add your location</string>
+    <string name="select_contractor_type">Select Contractor Type</string>
+    <string name="task_due_date">Task Due Date</string>
     <string-array name="contractor_array">
         <item>Electrician</item>
         <item>Plumber</item>

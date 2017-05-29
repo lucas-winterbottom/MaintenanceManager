@@ -32,9 +32,7 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
     public static final int REQUEST_CODE = 123;
     public static final int REQUEST_CODE1 = 1234;
     public static final String JOINING_CANCELLED = "Joining Cancelled";
-    private DatabaseReference mRef;
-    private FirebaseAuth mAuth;
-    private TextView mNoGroupMessageTv;
+    private TextView mNoGroupMessageTv,mGroupNameTV, mGroupMembersTV;
     private RecyclerView mRecycler;
     private FloatingActionButton mNewGroupTab, mAddMemberFab, mExistingGroupFab;
     private INavUnlocker mUnlocker;
@@ -59,10 +57,10 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_group, container, false);
-        mRef = FirebaseDatabase.getInstance().getReference();
-        mAuth = FirebaseAuth.getInstance();
         mNoGroupMessageTv = (TextView) rootView.findViewById(R.id.group_please_create_or_join_group_message_tv);
         mRecycler = (RecyclerView) rootView.findViewById(R.id.group_group_recycler);
+        mGroupNameTV = (TextView) rootView.findViewById(R.id.group_group_name_tv);
+        mGroupMembersTV = (TextView) rootView.findViewById(R.id.group_group_members_tv);
 
         //FAB Setup
         mNewGroupTab = (FloatingActionButton) rootView.findViewById(R.id.group_new_group);
@@ -71,6 +69,16 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         mExistingGroupFab.setOnClickListener(this);
         mAddMemberFab = (FloatingActionButton) rootView.findViewById(R.id.group_new_member);
         mAddMemberFab.setOnClickListener(this);
+
+
+        DatabaseHelper.getInstance().getGroup(new DatabaseHelper.IGroupListener() {
+            @Override
+            public void onGroup(Group group) {
+                mGroupNameTV.setText(group.getGroupName());
+                mGroupMembersTV.append(String.valueOf(group.getGroupMembers().size()));
+                mGroupMembersTV.setVisibility(View.VISIBLE);
+            }
+        });
         GroupsPresenter presenter = new GroupsPresenter();
         presenter.getGroupRecycler(new TasksPresenter.IOnRecyclerAdapterListener() {
             @Override
@@ -123,6 +131,7 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
             if (resultCode == ResultCodes.OK) {
                 String groupName = data.getStringExtra(Constants.GROUP_NAME);
                 String groupPin = data.getStringExtra(Constants.GROUP_PIN);
+                //// TODO: 26/5/17 check validation
                 DatabaseHelper.getInstance().createGroup(new Group(groupName, Integer.parseInt(groupPin)));
                 mUnlocker.unlockNavDrawer();
             } else {
@@ -134,9 +143,7 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
             if (resultCode == ResultCodes.OK) {
                 //// TODO: 24/5/17 check if the group exist and the key matches if not send correct error message
                 DatabaseHelper.getInstance().joinExistingGroup(data.getStringExtra(Constants.GROUP_KEY));
-                final String groupKey = data.getStringExtra(Constants.GROUP_KEY);
                 mUnlocker.unlockNavDrawer();
-
             } else {
                 Snackbar.make(getView(), JOINING_CANCELLED, Snackbar.LENGTH_SHORT).show();
             }

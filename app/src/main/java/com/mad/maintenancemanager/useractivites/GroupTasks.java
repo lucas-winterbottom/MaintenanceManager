@@ -29,6 +29,8 @@ import com.mad.maintenancemanager.model.MaintenanceTask;
 import com.mad.maintenancemanager.model.User;
 import com.mad.maintenancemanager.presenter.TasksPresenter;
 
+import java.util.Date;
+
 /**
  * Fragment that shows the user the tasks for the group they are currently in, gathers the users
  * group and then uses that to gather the
@@ -36,7 +38,8 @@ import com.mad.maintenancemanager.presenter.TasksPresenter;
 public class GroupTasks extends Fragment {
 
     public static final int REQUEST_CODE = 123;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    ;
     private DatabaseReference mTaskRef;
     private RecyclerView mRecycler;
     private FirebaseRecyclerAdapter<MaintenanceTask, MaintenanceTaskHolder> mAdapter;
@@ -72,11 +75,10 @@ public class GroupTasks extends Fragment {
                 mRecycler.setAdapter(adapter);
                 //hideProgress();
             }
-        },false);
+        }, false);
 
         return rootView;
     }
-
 
 
     /**
@@ -87,15 +89,17 @@ public class GroupTasks extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE) {
             if (resultCode == ResultCodes.OK) {
-                DatabaseHelper.getInstance().saveTask(new MaintenanceTask(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
-                        data.getStringExtra(Constants.TASK_NAME),
-                        data.getStringExtra(Constants.TASK_DESCRIPTION),
-                        data.getBooleanExtra(Constants.CONTRACTOR_NEEDED, false),
-                        data.getStringExtra(Constants.ASSIGNED_MEMBER),
-                        data.getStringExtra(Constants.TASK_ITEMS)));
+                if (data.getBooleanExtra(Constants.CONTRACTOR_NEEDED, false)) {
+
+                } else {
+                    DatabaseHelper.getInstance().saveTask(new MaintenanceTask(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
+                            data.getStringExtra(Constants.TASK_NAME),
+                            data.getStringExtra(Constants.TASK_DESCRIPTION),
+                            data.getStringExtra(Constants.ASSIGNED_MEMBER),
+                            data.getStringExtra(Constants.TASK_ITEMS),
+                            (Date) data.getSerializableExtra(Constants.DUE_DATE)));
+                }
             }
-
-
         }
     }
 }

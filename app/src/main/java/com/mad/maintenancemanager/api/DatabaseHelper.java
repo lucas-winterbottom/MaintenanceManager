@@ -86,23 +86,25 @@ public class DatabaseHelper {
 
     }
 
-    public void getGroupMembers(final IGroupListener listener) {
+    public void getGroup(final IGroupListener listener) {
         getGroupKey(new IGroupKeyListener() {
             @Override
             public void onGroupKey(final String key) {
-                DatabaseReference group = FirebaseDatabase.getInstance().getReference(Constants.GROUPS);
-                group.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Group group = dataSnapshot.child(key).getValue(Group.class);
-                        listener.onGroup(group);
-                    }
+                if(key!=null){
+                    DatabaseReference group = FirebaseDatabase.getInstance().getReference(Constants.GROUPS);
+                    group.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Group group = dataSnapshot.child(key).getValue(Group.class);
+                            listener.onGroup(group);
+                        }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+                        }
+                    });
+                }
             }
         });
     }
@@ -152,6 +154,7 @@ public class DatabaseHelper {
         reference.child(Constants.GROUPS).child(stringExtra).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                // // TODO: 26/5/17 Change this so that i just add below the current one also check if the key is correct
                 Group group = dataSnapshot.getValue(Group.class);
                 group.getGroupMembers().add(DatabaseHelper.getInstance().getDisplayName());
                 reference.child(Constants.GROUPS).child(stringExtra).setValue(group);

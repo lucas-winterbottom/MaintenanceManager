@@ -1,6 +1,8 @@
 package com.mad.maintenancemanager.model;
 
-import java.net.URL;
+import com.google.android.gms.location.places.Place;
+
+import java.util.Date;
 
 /**
  * Created by lucaswinterbottom on 14/5/17.
@@ -14,31 +16,37 @@ public class MaintenanceTask {
     private String mAssignedTo;
     private String mNeededItems;
     //private URL mImageURL;
+    private String mDueDate;
     private String mTradeType;
+    private Place mTaskLocation;
 
 
-    public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, String neededItems, URL imageURL, String tradeType) {
+    public MaintenanceTask(String creatorID, String name, String description, String assignedTo, String neededItems, Date dueDate) {
         mCreatorID = creatorID;
         mName = name;
         mDescription = description;
-        mTaskType = taskType;
         mAssignedTo = assignedTo;
         mNeededItems = neededItems;
-       // mImageURL = imageURL;
-        mTradeType = tradeType;
-
+        mDueDate = dueDate.toString();
     }
 
-    public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, String neededItems) {
-        mCreatorID = creatorID;
-        mName = name;
-        mDescription = description;
-        mTaskType = taskType;
-        mAssignedTo = assignedTo;
-        mNeededItems = neededItems;
+    public String getDueDate() {
+        return mDueDate;
     }
 
-    public MaintenanceTask() {
+    public void setDueDate(String dueDate) {
+        mDueDate = dueDate;
+    }
+
+    public Place getTaskLocation() {
+        return mTaskLocation;
+    }
+
+    public void setTaskLocation(Place taskLocation) {
+        mTaskLocation = taskLocation;
+    }
+
+    public MaintenanceTask(){
         //For Firebase
     }
 

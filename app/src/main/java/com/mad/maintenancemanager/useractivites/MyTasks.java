@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.mad.maintenancemanager.Constants;
@@ -23,6 +24,7 @@ public class MyTasks extends Fragment {
     private FirebaseRecyclerAdapter mAdapter;
     private ProgressBar mProgress;
     private RecyclerView mRecycler;
+    private TextView mNoTasksMessageTv;
 
     /**
      * Empty Constructor for fragment use
@@ -38,6 +40,7 @@ public class MyTasks extends Fragment {
 
         mProgress = (ProgressBar) rootView.findViewById(R.id.my_tasks_progress);
         mRecycler = (RecyclerView) rootView.findViewById(R.id.my_tasks_recycler);
+        mNoTasksMessageTv = (TextView) rootView.findViewById(R.id.no_task_message);
         mRecycler.setHasFixedSize(false);
         mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -45,16 +48,16 @@ public class MyTasks extends Fragment {
         presenter.getRecyclerAdapter(Constants.TASKS_ACTIVE_TASKS, new TasksPresenter.IOnRecyclerAdapterListener() {
             @Override
             public void onRecyclerAdapter(FirebaseRecyclerAdapter adapter) {
-                if(adapter!=null){
-                    mRecycler.setAdapter(adapter);
-                    hideProgress();
+                mRecycler.setAdapter(adapter);
+                hideProgress();
+                if (adapter.getItemCount() == 0) {
+                    mNoTasksMessageTv.setVisibility(View.VISIBLE);
                 }
             }
-        },false);
+        }, false);
 
         return rootView;
     }
-
 
 
     /**
