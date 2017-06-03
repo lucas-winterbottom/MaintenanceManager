@@ -19,9 +19,6 @@ import com.mad.maintenancemanager.model.MaintenanceTask;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.temporal.ChronoUnit;
 
-/**
- * Created by lucaswinterbottom on 22/5/17.
- */
 
 public class TasksPresenter {
     private Context mContext;
@@ -76,7 +73,7 @@ public class TasksPresenter {
     }
 
 
-    public interface IOnRecyclerAdapterListener {
+    public interface  IOnRecyclerAdapterListener {
         void onRecyclerAdapter(FirebaseRecyclerAdapter adapter);
 
     }

@@ -26,4 +26,5 @@ public class Constants {
     public static final String TASK_LOCATION = "taskLocation";
     public static final String CONTRACTOR_TYPE = "contractorType";
     public static final String DUE_DATE = "dueDate";
+    public static final String TRADE = "trade";
 }

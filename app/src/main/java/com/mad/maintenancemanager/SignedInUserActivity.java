@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.mad.maintenancemanager.api.DatabaseHelper;
+import com.mad.maintenancemanager.tradeactivities.MapActivity;
 import com.mad.maintenancemanager.useractivites.CompletedTasksFragment;
 import com.mad.maintenancemanager.useractivites.GroupFragment;
 import com.mad.maintenancemanager.useractivites.GroupTasks;
@@ -56,6 +57,7 @@ public class SignedInUserActivity extends AppCompatActivity
         //Firebase Stuff
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
+        //If trade login
 
 
         //My Stuff
@@ -69,9 +71,6 @@ public class SignedInUserActivity extends AppCompatActivity
         toggle.syncState();
 
         splashScreen();
-
-        //// TODO: 24/5/17 Make this cater for trade view
-        DatabaseHelper.getInstance().checkUserData();
         DatabaseHelper.getInstance().setGroupKey(new DatabaseHelper.IGroupKeyListener() {
             @Override
             public void onGroupKey(String key) {
@@ -83,6 +82,7 @@ public class SignedInUserActivity extends AppCompatActivity
                 }
             }
         });
+
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -123,18 +123,7 @@ public class SignedInUserActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Creates an intent that includes the extra data from login in the intent
-     *
-     * @param context     Application Context
-     * @param idpResponse Response from login services
-     * @return The intent that includes the IDP data
-     */
-    public static Intent createIntent(Context context, IdpResponse idpResponse) {
-        Intent in = IdpResponse.getIntent(idpResponse);
-        in.setClass(context, SignedInUserActivity.class);
-        return in;
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

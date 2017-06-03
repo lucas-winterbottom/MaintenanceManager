@@ -8,9 +8,19 @@ public class User {
     private String mDisplayName;
     private String mGroupKey;
     private boolean mIsContractor;
+    private String mTrade;
+
+    public String getTrade() {
+        return mTrade;
+    }
+
+    public void setTrade(String trade) {
+        mTrade = trade;
+    }
 
     public User() {
     }
+
 
     public User(String displayName, String groupKey, boolean isContractor) {
 

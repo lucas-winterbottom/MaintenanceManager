@@ -159,7 +159,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/authui_colorAccent"
+        android:background="@color/colorPrimaryDark"
         android:gravity="center">
 
         <Button
@@ -168,7 +168,7 @@
             android:layout_height="50dp"
             android:layout_gravity="center"
             android:backgroundTint="@color/colorPrimary"
-            android:text="Create Task"
+            android:text="@string/create_task"
             android:textColor="@color/tw__solid_white"
             android:textStyle="bold"
             />

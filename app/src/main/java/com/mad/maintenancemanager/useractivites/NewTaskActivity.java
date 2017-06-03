@@ -14,6 +14,7 @@ import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
@@ -26,7 +27,9 @@ import com.mad.maintenancemanager.R;
 import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.model.Group;
 import com.mad.maintenancemanager.model.MaintenanceTask;
-import com.mad.maintenancemanager.presenter.NewTasksPresenter;
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
 import org.threeten.bp.LocalDate;
 
@@ -34,25 +37,30 @@ import java.sql.Date;
 import java.util.Calendar;
 import java.util.List;
 
-public class NewTaskActivity extends AppCompatActivity implements View.OnClickListener {
+public class NewTaskActivity extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
 
     private Spinner mGroupMemberSpinner;
     private List<String> mGroupMembers;
     private Spinner mContractorSpinner;
     private Switch mContractorSwitch;
-    private TextInputEditText mTaskNameEt, mTaskDescriptionEt, mTaskExtraItemsEt, mTaskDueDateEt;
+    @NotEmpty
+    private TextInputEditText mTaskNameEt, mTaskDescriptionEt, mTaskExtraItemsEt;
+    private TextInputEditText mTaskDueDateEt;
     private Button mSubmitButton;
     private PlaceAutocompleteFragment mAutocompleteFragment;
     private LinearLayout mContractorInfo;
     private Place mPlace;
     private int mDay, mMonth, mYear;
     private LocalDate mDueDate;
+    private Validator mValidator;
+    private boolean mValidDate;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_task);
+        //XML element binding
         mGroupMemberSpinner = (Spinner) findViewById(R.id.new_task_assign_to_spnr);
         mContractorSpinner = (Spinner) findViewById(R.id.new_task_contractor_type_spnr);
         mContractorSwitch = (Switch) findViewById(R.id.new_task_contractor_switch);
@@ -61,10 +69,10 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
         mContractorInfo = (LinearLayout) findViewById(R.id.new_task_contractor_info);
         mTaskExtraItemsEt = (TextInputEditText) findViewById(R.id.new_task_needed_items_et);
         mTaskDueDateEt = (TextInputEditText) findViewById(R.id.new_task_task_date_et);
-
-
         mSubmitButton = (Button) findViewById(R.id.new_task_submit_button);
         mSubmitButton.setOnClickListener(this);
+
+        //Activity Setup
         getSupportActionBar().setTitle(getString(R.string.create_a_new_task));
         setupPlaceFragment();
         setupTypeSpinner();
@@ -78,7 +86,6 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         });
-
         DatabaseHelper.getInstance().getGroup(new DatabaseHelper.IGroupListener() {
             @Override
             public void onGroup(Group group) {
@@ -87,6 +94,10 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
                 setupMemberSpinner();
             }
         });
+
+        //Saripaar Validation
+        mValidator = new Validator(this);
+        mValidator.setValidationListener(this);
     }
 
     private void setupMemberSpinner() {
@@ -109,7 +120,6 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
         mContractorSpinner.setAdapter(adapter);
     }
 
-    //// TODO: 26/5/17 maybe make activity for result
     private void setupPlaceFragment() {
         mAutocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -130,6 +140,47 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
+        mValidator.validate();
+    }
+
+    private String constructDate(int selectedYear, int selectedMonth, int selectedDay) {
+        return Date.valueOf(selectedYear + "-" + selectedMonth + "-" + selectedDay).toString();
+    }
+
+    //// TODO: 29/5/17 Consider moving to presenter same with setups
+    public void showDatePicker(View view) {
+        //To show current date in the DatePicker
+        Calendar mCurrentDate = Calendar.getInstance();
+        mYear = mCurrentDate.get(Calendar.YEAR);
+        mMonth = mCurrentDate.get(Calendar.MONTH);
+        mDay = mCurrentDate.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog mDatePicker = new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
+            public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
+                String date = constructDate(selectedYear, selectedMonth + 1, selectedDay);
+                mDueDate = LocalDate.parse(date);
+                if(mDueDate.isBefore(LocalDate.now())){
+                    Toast.makeText(getApplicationContext(), "Please choose a date in the future",Toast.LENGTH_LONG).show();
+                    mTaskDueDateEt.setError("!");
+                    mValidDate = false;
+                }
+                else
+                {
+                    mTaskDueDateEt.setError(null);
+                    mValidDate = true;
+                }
+                mTaskDueDateEt.setText(mDueDate.toString());
+
+                    /*      Your code   to get date and time    */
+            }
+        }, mYear, mMonth, mDay);
+        mDatePicker.setTitle(getString(R.string.select_date));
+        mDatePicker.show();
+    }
+
+    @Override
+    public void onValidationSucceeded() {
+        Toast.makeText(this, "Yay! we got it right!", Toast.LENGTH_SHORT).show();
         Intent result = new Intent();
         MaintenanceTask task = new MaintenanceTask(DatabaseHelper.getInstance().getDisplayName(),
                 mTaskNameEt.getText().toString(),
@@ -148,29 +199,22 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
         finish();
     }
 
-    private String constructDate(int selectedYear, int selectedMonth, int selectedDay) {
-        return Date.valueOf(selectedYear + "-" + selectedMonth + "-" + selectedDay).toString();
-    }
+    @Override
+    public void onValidationFailed(List<ValidationError> errors) {
+        for (ValidationError error : errors) {
+            View view = error.getView();
+            String message = error.getCollatedErrorMessage(this);
 
-    //// TODO: 29/5/17 Consider moving to presenter same with setups
-    public void showDatePicker(View view) {
-        //To show current date in the datepicker
-        Calendar mCurrentDate = Calendar.getInstance();
-        mYear = mCurrentDate.get(Calendar.YEAR);
-        mMonth = mCurrentDate.get(Calendar.MONTH);
-        mDay = mCurrentDate.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog mDatePicker = new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
-            public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
-                // TODO Auto-generated method stub
-                String date = constructDate(selectedYear, selectedMonth + 1, selectedDay);
-                mDueDate = LocalDate.parse(date);
-                mTaskDueDateEt.setText(date);
-                    /*      Your code   to get date and time    */
+            // Display error messages ;)
+            if (view.getId() == R.id.new_task_task_date_et) {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                ((TextInputEditText) view).setError(message);
+            } else if (view instanceof TextInputEditText) {
+                ((TextInputEditText) view).setError(message);
+            } else {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
-        }, mYear, mMonth, mDay);
-        mDatePicker.setTitle("Select date");
-        mDatePicker.show();
+        }
     }
 }
 

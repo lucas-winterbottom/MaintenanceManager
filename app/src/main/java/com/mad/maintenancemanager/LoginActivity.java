@@ -1,16 +1,20 @@
 package com.mad.maintenancemanager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -28,11 +32,12 @@ public class LoginActivity extends AppCompatActivity {
     public static final int REQUEST_CODE = 123;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private boolean mIsTradie = false;
 
     // UI references.
 
-    private View mProgressView;
     private View mLoginFormView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +48,19 @@ public class LoginActivity extends AppCompatActivity {
 
 
         //Sets up the sign in button
-        final Button emailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        final Button emailSignInButton = (Button) findViewById(R.id.normal_sign_in_button);
         emailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                startLogin();
+            }
+        });
+        final Button tradeLogin = (Button) findViewById(R.id.tradie_sign_in_button);
+        tradeLogin.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mIsTradie = true;
+                startLogin();
             }
         });
 
@@ -60,7 +73,8 @@ public class LoginActivity extends AppCompatActivity {
                 if (user != null) {
                     // User is signed in
                     Log.d(Constants.FIREBASE, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Intent intent = new Intent(LoginActivity.this, SignedInUserActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, LoginHandlerActivity.class);
+                    intent.putExtra(Constants.CONTRACTOR_NEEDED, mIsTradie);
                     startActivity(intent);
                     finish();
 
@@ -80,13 +94,13 @@ public class LoginActivity extends AppCompatActivity {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    private void startLogin() {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setIsSmartLockEnabled(false)
-                        .setLogo(R.drawable.logo2)
-                        .setTheme(R.style.AppTheme)
+                        .setLogo(R.drawable.logo4)
+                        .setTheme(R.style.BlueTheme)
                         .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
                                 new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
                         .build(),
@@ -101,7 +115,9 @@ public class LoginActivity extends AppCompatActivity {
 
             // Successfully signed in
             if (resultCode == ResultCodes.OK) {
-                startActivity(SignedInUserActivity.createIntent(this, response));
+                Intent progressIntent = LoginHandlerActivity.createIntent(this, response);
+                progressIntent.putExtra(Constants.CONTRACTOR_NEEDED, mIsTradie);
+                startActivity(progressIntent);
                 finish();
                 return;
             } else {
@@ -132,16 +148,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -156,63 +162,4 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-
 }
-/**
- * Represents an asynchronous login/registration task used to authenticate
- * the user.
- */
-
-//    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-//
-//        private final String mEmail;
-//        private final String mPassword;
-//
-//        UserLoginTask(String email, String password) {
-//            mEmail = email;
-//            mPassword = password;
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(Void... params) {
-//            // TODO: attempt authentication against a network service.
-//
-//            try {
-//                // Simulate network access.
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                return false;
-//            }
-//
-//            for (String credential : DUMMY_CREDENTIALS) {
-//                String[] pieces = credential.split(":");
-//                if (pieces[0].equals(mEmail)) {
-//                    // Account exists, return true if the password matches.
-//                    return pieces[1].equals(mPassword);
-//                }
-//            }
-//
-//            // TODO: register the new account here.
-//            return true;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(final Boolean success) {
-//            mAuthTask = null;
-//            showProgress(false);
-//
-//            if (success) {
-//                finish();
-//            } else {
-//                mPasswordView.setError(getString(R.string.error_incorrect_password));
-//                mPasswordView.requestFocus();
-//            }
-//        }
-//
-//        @Override
-//        protected void onCancelled() {
-//            mAuthTask = null;
-//            showProgress(false);
-//        }
-//    }
-

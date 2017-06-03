@@ -22,9 +22,6 @@ import com.mad.maintenancemanager.presenter.TasksPresenter;
  * Fragment that shows the user the tasks currently assigned to them
  */
 public class MyTasks extends Fragment {
-
-    public static final int REQUEST_CODE = 123;
-    private FirebaseRecyclerAdapter mAdapter;
     private ProgressBar mProgress;
     private RecyclerView mRecycler;
     private TextView mNoTasksMessageTv;
@@ -58,7 +55,6 @@ public class MyTasks extends Fragment {
                     mNoTasksMessageTv.setVisibility(View.VISIBLE);
                 } else {
                     mNoTasksMessageTv.setVisibility(View.GONE);
-
                 }
 
             }

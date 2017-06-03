@@ -139,6 +139,14 @@
     <string name="days_remaining">\u0020days remaining</string>
     <string name="due_tomorrow">Due tomorrow</string>
     <string name="days_overdue">\u0020days overdue</string>
+    <string name="create_task">Create Task</string>
+    <string name="select_date">Select date</string>
+    <string name="tradesperson">Tradesperson</string>
+    <string name="general_user">General User</string>
+    <string name="choose_a_user_type">Choose a user Type</string>
+    <string name="group_name">Group Name</string>
+    <string name="setup_a_workgroup_and_add_your_coworkers">Setup a WorkGroup and add your Coworkers</string>
+    <string name="group_pin">Group Pin</string>
     <string-array name="contractor_array">
         <item>Electrician</item>
         <item>Plumber</item>
@@ -150,4 +158,8 @@
         <item>Delete</item>
         <item>Cancel</item>
     </string-array>
+
+    <string name="google_maps_key">AIzaSyAno6DZ3mc_6ioO119xgU_X0K4lI1-L1as</string>
+    <string name="task_near_you">Tasks Near You</string>
+
 </resources>

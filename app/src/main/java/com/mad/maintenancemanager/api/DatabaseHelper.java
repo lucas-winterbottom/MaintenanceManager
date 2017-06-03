@@ -8,6 +8,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.mad.maintenancemanager.Constants;
+import com.mad.maintenancemanager.LoginHandlerActivity;
 import com.mad.maintenancemanager.model.Group;
 import com.mad.maintenancemanager.model.MaintenanceTask;
 import com.mad.maintenancemanager.model.User;
@@ -39,12 +40,11 @@ public class DatabaseHelper {
     }
 
     public void setGroupKey(final IGroupKeyListener listener) {
-        final String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference userInfo = FirebaseDatabase.getInstance().getReference(Constants.USERS);
         userInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.child(currentUser).getValue(User.class);
+                User user = dataSnapshot.child(getUserID()).getValue(User.class);
                 if (user != null) {
                     if (user.getGroupKey() != null) {
                         listener.onGroupKey(user.getGroupKey());
@@ -91,7 +91,6 @@ public class DatabaseHelper {
         ref.removeValue();
     }
 
-
     public void getGroup(final IGroupListener listener) {
 
         if (mGroupKey != null) {
@@ -115,32 +114,8 @@ public class DatabaseHelper {
         mDatabaseHelper = null;
     }
 
-
     public String getUserID() {
         return mUID;
-    }
-
-    /**
-     * Checks if the user already has data on the server if not, sets up the base user on the server
-     */
-    public void checkUserData() {
-        final DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference(Constants.USERS).child(getUserID());
-        dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if (user == null) {
-                    dataRef.setValue(new User(getDisplayName(), null, false));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
     }
 
     public String getDisplayName() {
@@ -193,6 +168,41 @@ public class DatabaseHelper {
         return FirebaseDatabase.getInstance().getReference(Constants.TASKS_COMPLETED_TASKS)
                 .child(mGroupKey)
                 .orderByChild(Constants.DUE_DATE);
+    }
+
+
+    /**
+     * Checks if the user already has data on the server if not, sets up the base user on the server,
+     * also gives back the type
+     */
+    public void initialSetupCheck(final LoginHandlerActivity.IOnUserTypeListener listener, final boolean isTradie) {
+        final DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference(Constants.USERS).child(getUserID());
+        dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if (user == null) {
+                    dataRef.setValue(new User(getDisplayName(), null, isTradie));
+                    listener.onUserType(isTradie);
+                }
+                else if(user.getTrade() == null) {
+                    listener.onUserType(user.isContractor());
+                }
+                else{
+                    listener.onTradeSelected();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+    public void setTradeType(String trade){
+        FirebaseDatabase.getInstance().getReference(Constants.USERS).child(getUserID()).child(Constants.TRADE).setValue(trade);
     }
 
     public interface IGroupKeyListener {

@@ -33,9 +33,6 @@ import com.mad.maintenancemanager.presenter.TasksPresenter;
 public class GroupTasks extends Fragment {
 
     public static final int REQUEST_CODE = 123;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    ;
-    private DatabaseReference mTaskRef;
     private RecyclerView mRecycler;
     private FirebaseRecyclerAdapter<MaintenanceTask, MaintenanceTaskHolder> mAdapter;
     private Query mRef;

@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-permission android:name="android.permission.READ_PROFILE"/>
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
 
     <application
         android:allowBackup="true"
@@ -13,10 +15,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme.NoActionBar">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyB5RxErQWYrdre7Sn62JOvt8D-klmp0sBM"/>
+            android:value="@string/google_maps_key"/>
+
         <activity
             android:name=".LoginActivity"
             android:label="Maintenance Manager"
@@ -32,11 +35,25 @@
             android:label="@string/loading"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".useractivites.NewTaskActivity"/>
-        <activity android:name=".useractivites.NewGroupActivity"/>
-        <activity android:name=".useractivites.JoinExisting">
-        </activity>
+        <activity
+            android:name=".useractivites.NewTaskActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".useractivites.NewGroupActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".useractivites.JoinExisting"
+            android:screenOrientation="portrait">
 
+        </activity>
+        <activity
+            android:name=".tradeactivities.MapActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".LoginHandlerActivity"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Setup a WorkGroup and add your Coworkers" />
+        android:text="@string/setup_a_workgroup_and_add_your_coworkers" />
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -25,7 +25,7 @@
             android:id="@+id/add_group_name_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Group Name"
+            android:hint="@string/group_name"
             android:maxLength="30" />
     </android.support.design.widget.TextInputLayout>
 
@@ -38,7 +38,7 @@
             android:id="@+id/add_group_pin_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Group Pin"
+            android:hint="@string/group_pin"
             android:inputType="numberPassword" />
     </android.support.design.widget.TextInputLayout>
 
