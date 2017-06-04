@@ -159,7 +159,24 @@
         <item>Cancel</item>
     </string-array>
 
-    <string name="google_maps_key">AIzaSyAno6DZ3mc_6ioO119xgU_X0K4lI1-L1as</string>
+    <string name="google_maps_key">AIzaSyDs5KduAatqZ1j4ORyI7GP0LUui9Yql45E</string>
     <string name="task_near_you">Tasks Near You</string>
-
+    <string name="no_group_tasks">It seems your group has no active tasks, use the button below to create one</string>
+    <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>
+    <string name="location_permission_denied">This sample requires location permission to enable the \'my location\' layer. Please try again and grant access to use the location.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Google Maps API Demos\'.</string>
+    <string name="permission_required_toast">Location permission is required for this demo.</string>
+    <string name="mobile_no">Mobile Number</string>
+    <string name="mobile_no_promt">Enter mobile number below</string>
+    <string name="done_dialog_test">Done</string>
+    <string name="cancel_dialog_text">Cancel</string>
+    <string name="valid_mobile_prompt">Please enter a valid Mobile Number (10 Digits)</string>
+    <string name="available_tasks">Available Tasks:</string>
+    <string name="gps_settings">GPS is settings</string>
+    <string name="gps_not_enable">GPS is not enabled. Do you want to go to settings menu?</string>
+    <string name="join_group_mm">Join my group on Maintenance Manager.\n</string>
+    <string name="group_code_qulaifier">Group Code:\u0020</string>
+    <string name="choose_trade">Choose your trade</string>
+    <string name="login">Login</string>
+    <string name="future_date">Please choose a date in the future</string>
+    <string name="exclamation">!</string>
 </resources>

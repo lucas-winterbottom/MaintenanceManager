@@ -19,6 +19,8 @@ import com.mad.maintenancemanager.model.MaintenanceTask;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.temporal.ChronoUnit;
 
+import java.util.List;
+
 
 public class TasksPresenter {
     private Context mContext;
@@ -35,10 +37,12 @@ public class TasksPresenter {
     public void getTasksRecyclerAdapter(final Query databasePath,
                                         final IOnRecyclerAdapterListener listener,
                                         final boolean isCompletedTasks) {
+
         adapter = new FirebaseRecyclerAdapter<MaintenanceTask,
                 MaintenanceTaskHolder>(MaintenanceTask.class,
                 R.layout.task_card, MaintenanceTaskHolder.class,
                 databasePath) {
+
 
             @Override
             protected void populateViewHolder(MaintenanceTaskHolder maintenanceTaskHolder,
@@ -73,7 +77,7 @@ public class TasksPresenter {
     }
 
 
-    public interface  IOnRecyclerAdapterListener {
+    public interface IOnRecyclerAdapterListener {
         void onRecyclerAdapter(FirebaseRecyclerAdapter adapter);
 
     }

@@ -13,6 +13,9 @@ import com.mad.maintenancemanager.model.Group;
 import com.mad.maintenancemanager.model.MaintenanceTask;
 import com.mad.maintenancemanager.model.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by lucaswinterbottom on 22/5/17.
  */
@@ -22,6 +25,8 @@ public class DatabaseHelper {
     private String mDisplayName;
     private String mUID;
     private String mGroupKey;
+    private String mTrade;
+    private String mMobile;
 
     public static DatabaseHelper getInstance() {
         if (mDatabaseHelper == null) {
@@ -35,17 +40,22 @@ public class DatabaseHelper {
         mDisplayName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
     }
 
+    public String getMobile() {
+        return mMobile;
+    }
+
     public String getGroupKey() {
         return mGroupKey;
     }
 
-    public void setGroupKey(final IGroupKeyListener listener) {
+    public void setGeneralUserData(final IGroupKeyListener listener) {
         DatabaseReference userInfo = FirebaseDatabase.getInstance().getReference(Constants.USERS);
         userInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.child(getUserID()).getValue(User.class);
                 if (user != null) {
+                    mMobile = user.getMobileNo();
                     if (user.getGroupKey() != null) {
                         listener.onGroupKey(user.getGroupKey());
                         mGroupKey = user.getGroupKey();
@@ -72,6 +82,16 @@ public class DatabaseHelper {
         databaseReference.child(taskKey).setValue(maintenanceTask);
     }
 
+    public void saveExternalTask(final MaintenanceTask maintenanceTask) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                .getReference(Constants.TASKS_ACTIVE_TASKS).child(mGroupKey);
+        String taskKey = databaseReference.push().getKey();
+
+        databaseReference.child(taskKey).setValue(maintenanceTask);
+        maintenanceTask.setMobile(getMobile());
+        FirebaseDatabase.getInstance().getReference(Constants.EXTERNAL_TASKS).child(taskKey).setValue(maintenanceTask);
+    }
+
     public void markDone(final DatabaseReference ref) {
 
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(Constants.TASKS_COMPLETED_TASKS).child(mGroupKey);
@@ -88,11 +108,11 @@ public class DatabaseHelper {
 
             }
         });
+        FirebaseDatabase.getInstance().getReference(Constants.EXTERNAL_TASKS).child(ref.getKey()).removeValue();
         ref.removeValue();
     }
 
     public void getGroup(final IGroupListener listener) {
-
         if (mGroupKey != null) {
             DatabaseReference group = FirebaseDatabase.getInstance().getReference(Constants.GROUPS);
             group.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -175,22 +195,13 @@ public class DatabaseHelper {
      * Checks if the user already has data on the server if not, sets up the base user on the server,
      * also gives back the type
      */
-    public void initialSetupCheck(final LoginHandlerActivity.IOnUserTypeListener listener, final boolean isTradie) {
+    public void initialSetupCheck(final LoginHandlerActivity.IOnUserTypeListener listener) {
         final DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference(Constants.USERS).child(getUserID());
         dataRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-                if (user == null) {
-                    dataRef.setValue(new User(getDisplayName(), null, isTradie));
-                    listener.onUserType(isTradie);
-                }
-                else if(user.getTrade() == null) {
-                    listener.onUserType(user.isContractor());
-                }
-                else{
-                    listener.onTradeSelected();
-                }
+                listener.onUserType(user);
             }
 
             @Override
@@ -200,9 +211,69 @@ public class DatabaseHelper {
         });
     }
 
+    public void setGeneralUser(String mobileNo) {
+        FirebaseDatabase.getInstance().getReference(Constants.USERS).child(getUserID())
+                .setValue(new User(getDisplayName(), null, mobileNo, false));
+    }
 
-    public void setTradeType(String trade){
-        FirebaseDatabase.getInstance().getReference(Constants.USERS).child(getUserID()).child(Constants.TRADE).setValue(trade);
+    public void setTradeUser(String trade) {
+        FirebaseDatabase.getInstance().getReference(Constants.USERS).child(getUserID())
+                .setValue(new User(getDisplayName(), null, true, trade));
+        mTrade = trade;
+    }
+
+    public void getTradieTasks(final IExternalTasksListener listener) {
+        if (mTrade != null) {
+            Query tasks = FirebaseDatabase.getInstance().getReference(Constants.EXTERNAL_TASKS).orderByChild(Constants.TRADE_TYPE).equalTo(getTrade());
+            tasks.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    List<MaintenanceTask> tasks = new ArrayList<MaintenanceTask>();
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        MaintenanceTask task = ds.getValue(MaintenanceTask.class);
+                        tasks.add(task);
+                    }
+                    listener.onTasks(tasks);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+    }
+
+    public String getTrade() {
+        return mTrade;
+    }
+
+    public void setTrade(final IOnTradeListener listener) {
+        DatabaseReference userInfo = FirebaseDatabase.getInstance().getReference(Constants.USERS);
+        userInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.child(getUserID()).getValue(User.class);
+                if (user != null) {
+                    if (user.getTrade() != null) {
+                        mTrade = user.getTrade();
+                        listener.onTrade();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // ...
+            }
+        });
+
+    }
+
+
+    public interface IOnTradeListener {
+        void onTrade();
     }
 
     public interface IGroupKeyListener {
@@ -211,5 +282,9 @@ public class DatabaseHelper {
 
     public interface IGroupListener {
         void onGroup(Group group);
+    }
+
+    public interface IExternalTasksListener {
+        void onTasks(List<MaintenanceTask> tasks);
     }
 }

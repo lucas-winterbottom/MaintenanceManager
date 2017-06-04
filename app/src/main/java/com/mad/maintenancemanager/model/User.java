@@ -9,6 +9,15 @@ public class User {
     private String mGroupKey;
     private boolean mIsContractor;
     private String mTrade;
+    private String mMobileNo;
+
+    public String getMobileNo() {
+        return mMobileNo;
+    }
+
+    public void setMobileNo(String mobileNo) {
+        mMobileNo = mobileNo;
+    }
 
     public String getTrade() {
         return mTrade;
@@ -21,14 +30,20 @@ public class User {
     public User() {
     }
 
+    public User(String displayName, String groupKey, boolean isContractor, String trade) {
+        mDisplayName = displayName;
+        mGroupKey = groupKey;
+        mIsContractor = isContractor;
+        mTrade = trade;
+    }
 
-    public User(String displayName, String groupKey, boolean isContractor) {
+    public User(String displayName, String groupKey, String mobileNo, boolean isContractor) {
 
         mDisplayName = displayName;
         mGroupKey = groupKey;
         mIsContractor = isContractor;
+        mMobileNo = mobileNo;
     }
-
 
 
     public void setDisplayName(String displayName) {

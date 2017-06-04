@@ -3,42 +3,60 @@ package com.mad.maintenancemanager.tradeactivities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.auth.FirebaseAuth;
+import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.LoginActivity;
 import com.mad.maintenancemanager.R;
 import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.api.GPSTracker;
+import com.mad.maintenancemanager.api.PermissionUtils;
+import com.mad.maintenancemanager.model.MaintenanceTask;
+import com.mad.maintenancemanager.model.TempPlace;
+import com.mad.maintenancemanager.presenter.PlacesPresenter;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+import java.util.List;
+
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleMap.OnMarkerClickListener{
 
     private static final int REQUEST_CODE_PERMISSION = 2;
+    private static final int GOOGLE_API_CLIENT_ID = 0;
     private String mPermission = Manifest.permission.ACCESS_FINE_LOCATION;
     private GPSTracker mGPS;
+    private GoogleApiClient mGoogleApiClient;
+    private GoogleMap mGoogleMap;
+    private TempPlace mTempPlace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+
         Toolbar myToolbar = (Toolbar) findViewById(R.id.map_toolbar);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setTitle(R.string.task_near_you);
@@ -50,9 +68,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{mPermission},
                     REQUEST_CODE_PERMISSION);
-            return;
+        } else {
+            createGoogleApiClient();
+            prepMap();
         }
     }
+
+    private void createGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(MapActivity.this)
+                .addApi(Places.GEO_DATA_API)
+                .enableAutoManage(this, GOOGLE_API_CLIENT_ID, this)
+                .addConnectionCallbacks(this)
+                .build();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode != REQUEST_CODE_PERMISSION) {
+            return;
+        }
+
+        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
+                Manifest.permission.ACCESS_FINE_LOCATION)) {
+            // Enable the my location layer if the permission has been granted.
+            prepMap();
+        } else {
+            // Display the missing permission error dialog when the fragments resume.//// TODO: 4/6/17 handle denied permissions
+        }
+    }
+
+    private void prepMap() {
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(MapActivity.this);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -64,7 +114,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.map_action_sign_out:
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(MapActivity.this, LoginActivity.class);
@@ -82,10 +132,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        mGoogleMap = googleMap;
         LatLng currentLoc;
         // Add a marker in Sydney, Australia,
         // and move the map's camera to the same location.
         mGPS = new GPSTracker(MapActivity.this);
+        PlacesPresenter presenter = new PlacesPresenter(getApplicationContext(), mGoogleApiClient, mGoogleMap);
+        presenter.setTaskPlaces();
 
         // check if GPS enabled
         if (mGPS.canGetLocation()) {
@@ -93,7 +146,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             double latitude = mGPS.getLatitude();
             double longitude = mGPS.getLongitude();
             currentLoc = new LatLng(latitude, longitude);
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc, 13));
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc, 13));
 
         } else {
             // can't get location
@@ -101,9 +154,44 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             // Ask user to enable GPS/network in settings
             mGPS.showSettingsAlert();
         }
-        LatLng sydney = new LatLng(-33.852, 151.211);
-        googleMap.addMarker(new MarkerOptions().position(sydney)
-                .title("Marker in Sydney"));
+
+        //// TODO: 4/6/17 Make this its own method when everything else works
+        try {
+            googleMap.setMyLocationEnabled(true);
+
+        } catch (SecurityException e) {
+            Log.d(Constants.SECURITY, e.toString());
+        }
+        mGoogleMap.setOnMarkerClickListener(this);
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        TempPlace place = (TempPlace) marker.getTag();
+        Bundle bundle = new Bundle();
+        bundle.putString(Constants.TASK_LOCATION, place.getID());
+        bundle.putString(Constants.LOCATION_NAME,place.getName());
+        FragmentManager fm = getSupportFragmentManager();
+        LocationTasksFragment fragment = new LocationTasksFragment();
+        fragment.setArguments(bundle);
+        fragment.show(fm, Constants.PLACE_STUFF);
+        return false;
+
     }
 
 }

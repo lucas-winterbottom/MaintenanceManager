@@ -2,7 +2,6 @@ package com.mad.maintenancemanager.useractivites;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -47,7 +46,6 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         } catch (ClassCastException castException) {
             /** The activity does not implement the listener. */
         }
-
     }
 
     @Override
@@ -115,9 +113,9 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         }
         if (id == R.id.group_new_member_fab) {
             Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            String message = "Join my group on Maintenance Manager.\n" +
-                    "Group Code: " + DatabaseHelper.getInstance().getGroupKey();
+            intent.setType(Constants.TEXT_PLAIN);
+            String message = getString(R.string.join_group_mm) +
+                    getString(R.string.group_code_qulaifier) + DatabaseHelper.getInstance().getGroupKey();
             intent.putExtra(Intent.EXTRA_TEXT, message);
             startActivity(intent);
 
@@ -150,7 +148,7 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
             if (resultCode == ResultCodes.OK) {
                 //// TODO: 24/5/17 check if the group exist and the key matches if not send correct error message
                 DatabaseHelper.getInstance().joinExistingGroup(data.getStringExtra(Constants.GROUP_KEY));
-                DatabaseHelper.getInstance().setGroupKey(new DatabaseHelper.IGroupKeyListener() {
+                DatabaseHelper.getInstance().setGeneralUserData(new DatabaseHelper.IGroupKeyListener() {
                     @Override
                     public void onGroupKey(String key) {
                         refreshFragment();

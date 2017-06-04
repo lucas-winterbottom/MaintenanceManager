@@ -2,8 +2,6 @@ package com.mad.maintenancemanager.model;
 
 import com.google.android.gms.location.places.Place;
 
-import org.threeten.bp.LocalDate;
-
 /**
  * Created by lucaswinterbottom on 14/5/17.
  */
@@ -15,13 +13,25 @@ public class MaintenanceTask {
     private boolean mTaskType;
     private String mAssignedTo;
     private String mNeededItems;
+    //Potential future release
     //private URL mImageURL;
     private long mDueDate;
     private String mTradeType;
-    private Place mTaskLocation;
+    private String mTaskLocationData;
+
+    public String getMobile() {
+        return mMobile;
+    }
+
+    public void setMobile(String mobile) {
+        mMobile = mobile;
+    }
+
+    private String mMobile;
 
 
-    public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, String neededItems, long dueDate, String tradeType, Place taskLocation) {
+
+    public MaintenanceTask(String creatorID, String name, String description, boolean taskType, String assignedTo, String neededItems, long dueDate, String tradeType) {
         mCreatorID = creatorID;
         mName = name;
         mDescription = description;
@@ -30,7 +40,6 @@ public class MaintenanceTask {
         mNeededItems = neededItems;
         mDueDate = dueDate;
         mTradeType = tradeType;
-        mTaskLocation = taskLocation;
     }
 
     public long getDueDate() {
@@ -41,12 +50,12 @@ public class MaintenanceTask {
         mDueDate = dueDate;
     }
 
-    public Place getTaskLocation() {
-        return mTaskLocation;
+    public String getTaskLocationData() {
+        return mTaskLocationData;
     }
 
-    public void setTaskLocation(Place taskLocation) {
-        mTaskLocation = taskLocation;
+    public void setTaskLocationData(String taskLocationData) {
+        mTaskLocationData = taskLocationData;
     }
 
     public MaintenanceTask(){

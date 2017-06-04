@@ -1,5 +1,6 @@
 package com.mad.maintenancemanager;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -32,37 +34,13 @@ public class LoginActivity extends AppCompatActivity {
     public static final int REQUEST_CODE = 123;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private boolean mIsTradie = false;
 
     // UI references.
-
-    private View mLoginFormView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        mLoginFormView = (LinearLayout) findViewById(R.id.login_layout);
-
-
-        //Sets up the sign in button
-        final Button emailSignInButton = (Button) findViewById(R.id.normal_sign_in_button);
-        emailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startLogin();
-            }
-        });
-        final Button tradeLogin = (Button) findViewById(R.id.tradie_sign_in_button);
-        tradeLogin.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mIsTradie = true;
-                startLogin();
-            }
-        });
 
         //Firebase Code
         mAuth = FirebaseAuth.getInstance();
@@ -74,13 +52,13 @@ public class LoginActivity extends AppCompatActivity {
                     // User is signed in
                     Log.d(Constants.FIREBASE, "onAuthStateChanged:signed_in:" + user.getUid());
                     Intent intent = new Intent(LoginActivity.this, LoginHandlerActivity.class);
-                    intent.putExtra(Constants.CONTRACTOR_NEEDED, mIsTradie);
                     startActivity(intent);
                     finish();
 
                 } else {
                     // User is signed out
-                    Log.d(Constants.FIREBASE, "onAuthStateChanged:signed_out");
+                    startLogin();
+                    Log.d(Constants.FIREBASE, Constants.ON_AUTH_STATE_CHANGED_SIGNED_OUT);
                 }
 
             }
@@ -116,7 +94,6 @@ public class LoginActivity extends AppCompatActivity {
             // Successfully signed in
             if (resultCode == ResultCodes.OK) {
                 Intent progressIntent = LoginHandlerActivity.createIntent(this, response);
-                progressIntent.putExtra(Constants.CONTRACTOR_NEEDED, mIsTradie);
                 startActivity(progressIntent);
                 finish();
                 return;
@@ -144,7 +121,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showSnackbar(String message) {
-        Snackbar.make(mLoginFormView.getRootView(), message, Snackbar.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
 

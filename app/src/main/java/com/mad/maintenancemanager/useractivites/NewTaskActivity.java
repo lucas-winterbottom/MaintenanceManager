@@ -20,6 +20,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mad.maintenancemanager.Constants;
@@ -49,7 +50,7 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
     private Button mSubmitButton;
     private PlaceAutocompleteFragment mAutocompleteFragment;
     private LinearLayout mContractorInfo;
-    private Place mPlace;
+    private Place mPlace = null;
     private int mDay, mMonth, mYear;
     private LocalDate mDueDate;
     private Validator mValidator;
@@ -127,12 +128,10 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onPlaceSelected(Place place) {
                 mPlace = place;
-                Log.i("newtask", "Place: " + place.getName());
             }
 
             @Override
             public void onError(Status status) {
-                // TODO: Handle the error.
                 Log.i("newtask", "An error occurred: " + status);
             }
         });
@@ -160,8 +159,8 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
                 String date = constructDate(selectedYear, selectedMonth + 1, selectedDay);
                 mDueDate = LocalDate.parse(date);
                 if(mDueDate.isBefore(LocalDate.now())){
-                    Toast.makeText(getApplicationContext(), "Please choose a date in the future",Toast.LENGTH_LONG).show();
-                    mTaskDueDateEt.setError("!");
+                    Toast.makeText(getApplicationContext(), R.string.future_date,Toast.LENGTH_LONG).show();
+                    mTaskDueDateEt.setError(getString(R.string.exclamation));
                     mValidDate = false;
                 }
                 else
@@ -180,7 +179,6 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onValidationSucceeded() {
-        Toast.makeText(this, "Yay! we got it right!", Toast.LENGTH_SHORT).show();
         Intent result = new Intent();
         MaintenanceTask task = new MaintenanceTask(DatabaseHelper.getInstance().getDisplayName(),
                 mTaskNameEt.getText().toString(),
@@ -189,12 +187,11 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
                 mGroupMemberSpinner.getSelectedItem().toString(),
                 mTaskExtraItemsEt.getText().toString(),
                 mDueDate.toEpochDay(),
-                mContractorSpinner.getSelectedItem().toString(),
-                mPlace
-        );
+                mContractorSpinner.getSelectedItem().toString());
         Gson gson = new GsonBuilder().create();
         String stringTask = gson.toJson(task, MaintenanceTask.class);
         result.putExtra(Constants.TASKS, stringTask);
+        result.putExtra(Constants.PLACE,mPlace.getId());
         setResult(RESULT_OK, result);
         finish();
     }

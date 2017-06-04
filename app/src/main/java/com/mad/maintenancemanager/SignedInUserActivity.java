@@ -1,6 +1,5 @@
 package com.mad.maintenancemanager;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,12 +16,10 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.mad.maintenancemanager.api.DatabaseHelper;
-import com.mad.maintenancemanager.tradeactivities.MapActivity;
 import com.mad.maintenancemanager.useractivites.CompletedTasksFragment;
 import com.mad.maintenancemanager.useractivites.GroupFragment;
 import com.mad.maintenancemanager.useractivites.GroupTasks;
@@ -71,7 +68,7 @@ public class SignedInUserActivity extends AppCompatActivity
         toggle.syncState();
 
         splashScreen();
-        DatabaseHelper.getInstance().setGroupKey(new DatabaseHelper.IGroupKeyListener() {
+        DatabaseHelper.getInstance().setGeneralUserData(new DatabaseHelper.IGroupKeyListener() {
             @Override
             public void onGroupKey(String key) {
                 if (key != null) {
@@ -175,6 +172,7 @@ public class SignedInUserActivity extends AppCompatActivity
 
         return true;
     }
+
 
 }
 

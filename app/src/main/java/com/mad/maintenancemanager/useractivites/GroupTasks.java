@@ -9,11 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.ResultCodes;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.clans.fab.FloatingActionButton;
+import com.google.android.gms.location.places.Place;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
@@ -37,6 +39,7 @@ public class GroupTasks extends Fragment {
     private FirebaseRecyclerAdapter<MaintenanceTask, MaintenanceTaskHolder> mAdapter;
     private Query mRef;
     private ProgressBar mProgress;
+    private TextView mNoTasksMessageTv;
 
     /**
      * Empty constructor for fragment use
@@ -54,6 +57,8 @@ public class GroupTasks extends Fragment {
         mRecycler.setHasFixedSize(false);
         mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         mProgress = (ProgressBar) rootView.findViewById(R.id.group_tasks_progress);
+        mNoTasksMessageTv = (TextView) rootView.findViewById(R.id.no_group_task_message);
+
 
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.group_tasks_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -68,6 +73,11 @@ public class GroupTasks extends Fragment {
         presenter.getTasksRecyclerAdapter(mRef, new TasksPresenter.IOnRecyclerAdapterListener() {
             @Override
             public void onRecyclerAdapter(FirebaseRecyclerAdapter adapter) {
+                if (adapter.getItemCount() == 0) {
+                    mNoTasksMessageTv.setVisibility(View.VISIBLE);
+                } else {
+                    mNoTasksMessageTv.setVisibility(View.GONE);
+                }
                 mRecycler.setAdapter(adapter);
                 hideProgress();
             }
@@ -91,7 +101,10 @@ public class GroupTasks extends Fragment {
                 Gson gson = new GsonBuilder().create();
                 MaintenanceTask task = gson.fromJson(data.getStringExtra(Constants.TASKS),
                         MaintenanceTask.class);
+                String place = data.getStringExtra(Constants.PLACE);
+                task.setTaskLocationData(place);
                 if (task.isTaskType()) {
+                    DatabaseHelper.getInstance().saveExternalTask(task);
                 } else {
                     DatabaseHelper.getInstance().saveTask(task);
                 }

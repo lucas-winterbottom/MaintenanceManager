@@ -19,7 +19,7 @@ public class MaintenanceTaskHolder extends RecyclerView.ViewHolder {
         super(itemView);
         mName = (TextView) itemView.findViewById(R.id.task_name);
         mDescription = (TextView) itemView.findViewById(R.id.task_desc);
-        mDueDate = (TextView) itemView.findViewById(R.id.task_creator_id);
+        mDueDate = (TextView) itemView.findViewById(R.id.task_due_date);
         mTaskType = (ImageView) itemView.findViewById(R.id.task_type);
         mAssignedTo = (TextView) itemView.findViewById(R.id.task_assignee);
         mCardView = (CardView) itemView.findViewById(R.id.task_card_view);
