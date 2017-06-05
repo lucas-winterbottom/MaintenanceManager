@@ -23,8 +23,8 @@ public class NewGroupActivity extends AppCompatActivity implements Validator.Val
 
     @NotEmpty
     private EditText mGroupName;
-    @Password(min = 4)
-    private EditText mGroupPin;
+//    @Password(min = 4)
+//    private EditText mGroupPin;
     private Button mCreateBtn;
     private Button mCancelBtn;
     private Validator mValidator;
@@ -34,9 +34,10 @@ public class NewGroupActivity extends AppCompatActivity implements Validator.Val
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_group);
 
+        getSupportActionBar().setTitle(R.string.new_group);
 
         mGroupName = (EditText) findViewById(R.id.add_group_name_et);
-        mGroupPin = (EditText) findViewById(R.id.add_group_pin_et);
+//        mGroupPin = (EditText) findViewById(R.id.add_group_pin_et);
         mCancelBtn = (Button) findViewById(R.id.new_group_cancel_button);
         mCreateBtn = (Button) findViewById(R.id.new_group_create_button);
 
@@ -65,7 +66,7 @@ public class NewGroupActivity extends AppCompatActivity implements Validator.Val
     public void onValidationSucceeded() {
         Intent result = new Intent();
         result.putExtra(Constants.GROUP_NAME, mGroupName.getText().toString());
-        result.putExtra(Constants.GROUP_PIN, mGroupPin.getText().toString());
+//        result.putExtra(Constants.GROUP_PIN, mGroupPin.getText().toString());
         setResult(RESULT_OK, result);
         finish();
     }

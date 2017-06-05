@@ -27,11 +27,13 @@
         />
     <android.support.v7.widget.RecyclerView
         android:id="@+id/group_group_recycler"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/group_group_members_tv"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="@dimen/activity_vertical_margin">
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_centerInParent="true"
+        >
 
     </android.support.v7.widget.RecyclerView>
     <TextView
@@ -50,7 +52,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        fab:menu_colorNormal="@color/colorAccent">
+        fab:menu_colorNormal="@color/colorAccent"
+        fab:menu_icon="@drawable/ic_group_add">
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/group_existing_group_fab"
@@ -58,7 +61,7 @@
             android:layout_height="wrap_content"
             fab:fab_label="@string/join_e_group"
             fab:fab_size="mini"
-            fab:menu_colorNormal="@color/colorAccent"
+            fab:fab_colorNormal="@color/colorAccent"
             />
 
         <com.github.clans.fab.FloatingActionButton
@@ -67,7 +70,7 @@
             android:layout_height="wrap_content"
             fab:fab_label="@string/create_n_group"
             fab:fab_size="mini"
-            fab:menu_colorNormal="@color/colorAccent"
+            fab:fab_colorNormal="@color/colorAccent"
             />
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/group_new_member_fab"
@@ -76,7 +79,7 @@
             fab:fab_label="Invite new Member"
             fab:fab_size="mini"
             android:visibility="gone"
-            fab:menu_colorNormal="@color/colorAccent"
+            fab:fab_colorNormal="@color/colorAccent"
             />
 
     </com.github.clans.fab.FloatingActionMenu>

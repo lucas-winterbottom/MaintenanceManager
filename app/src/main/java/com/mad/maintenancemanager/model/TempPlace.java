@@ -3,7 +3,7 @@ package com.mad.maintenancemanager.model;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Created by lucaswinterbottom on 4/6/17.
+ * POJO for temp place object
  */
 
 public class TempPlace {

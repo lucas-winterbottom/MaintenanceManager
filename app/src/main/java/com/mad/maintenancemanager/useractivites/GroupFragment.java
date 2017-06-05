@@ -6,12 +6,14 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.ResultCodes;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -28,7 +30,6 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
 
     public static final int REQUEST_CODE = 123;
     public static final int REQUEST_CODE1 = 1234;
-    public static final String JOINING_CANCELLED = "Joining Cancelled";
     private TextView mNoGroupMessageTv, mGroupNameTV, mGroupMembersTV;
     private RecyclerView mRecycler;
     private FloatingActionButton mNewGroupTab, mAddMemberFab, mExistingGroupFab;
@@ -82,7 +83,7 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
                 if (adapter != null) {
                     alternateFabs();
                     mRecycler.setHasFixedSize(false);
-                    mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+                    mRecycler.setLayoutManager(new GridLayoutManager(getContext(), 2));
                     mRecycler.setAdapter(adapter);
                 } else {
                     mNoGroupMessageTv.setVisibility(View.VISIBLE);
@@ -134,10 +135,9 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE) {
             if (resultCode == ResultCodes.OK) {
+//                String groupPin = data.getStringExtra(Constants.GROUP_PIN);
                 String groupName = data.getStringExtra(Constants.GROUP_NAME);
-                String groupPin = data.getStringExtra(Constants.GROUP_PIN);
-                //// TODO: 26/5/17 check validation
-                DatabaseHelper.getInstance().createGroup(new Group(groupName, Integer.parseInt(groupPin)));
+                DatabaseHelper.getInstance().createGroup(new Group(groupName));
                 mUnlocker.unlockNavDrawer();
             } else {
                 Snackbar.make(getView(), R.string.creation_cancelled, Snackbar.LENGTH_SHORT).show();
@@ -146,17 +146,20 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         }
         if (requestCode == REQUEST_CODE1) {
             if (resultCode == ResultCodes.OK) {
-                //// TODO: 24/5/17 check if the group exist and the key matches if not send correct error message
-                DatabaseHelper.getInstance().joinExistingGroup(data.getStringExtra(Constants.GROUP_KEY));
-                DatabaseHelper.getInstance().setGeneralUserData(new DatabaseHelper.IGroupKeyListener() {
+                DatabaseHelper.getInstance().joinExistingGroup(data.getStringExtra(Constants.GROUP_KEY), new DatabaseHelper.IJoinGroupListener() {
                     @Override
-                    public void onGroupKey(String key) {
-                        refreshFragment();
+                    public void onTryJoinResult(boolean joined) {
+                        if (joined) {
+                            refreshFragment();
+                            mUnlocker.unlockNavDrawer();
+                        } else {
+                            Toast.makeText(getContext(), "Invalid group code", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
-                mUnlocker.unlockNavDrawer();
+
             } else {
-                Snackbar.make(getView(), JOINING_CANCELLED, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getView(), R.string.joining_cancelled, Snackbar.LENGTH_SHORT).show();
             }
 
         }

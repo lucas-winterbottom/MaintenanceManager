@@ -115,7 +115,9 @@ public class TasksPresenter {
                                 //adapter.getRef(position).removeValue();
                                 break;
                             case 1:
-                                adapter.getRef(position).removeValue();
+                                DatabaseReference ref = adapter.getRef(position);
+                                FirebaseDatabase.getInstance().getReference(Constants.EXTERNAL_TASKS).child(ref.getKey()).removeValue();
+                                ref.removeValue();
                                 break;
                             case 2:
                                 break;

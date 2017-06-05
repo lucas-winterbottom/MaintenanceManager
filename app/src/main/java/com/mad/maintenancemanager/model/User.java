@@ -1,7 +1,7 @@
 package com.mad.maintenancemanager.model;
 
 /**
- * Created by lucaswinterbottom on 18/5/17.
+ * POJO for user
  */
 
 public class User {

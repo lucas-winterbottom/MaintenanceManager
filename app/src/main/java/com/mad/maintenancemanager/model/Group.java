@@ -8,31 +8,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by lucaswinterbottom on 17/5/17.
+ * POJO for Group object
  */
 
 public class Group {
     private String mGroupName;
     private String mGroupCreator;
-    private int mGroupKey;
+    //next release group passwords
+    //private int mGroupKey;
     private List<String> mGroupMembers = new ArrayList<>();
 
-    public Group(String groupName, int groupKey) {
+    public Group(String groupName) {
         mGroupName = groupName;
-        mGroupKey = groupKey;
-    }
-
-    public Group(String groupName, String groupCreator, int groupKey, List<String> groupMembers) {
-        mGroupName = groupName;
-        mGroupCreator = groupCreator;
-        mGroupKey = groupKey;
-        mGroupMembers = groupMembers;
-    }
-
-    public Group(String groupCreator, int groupKey, List<String> groupMembers) {
-        mGroupCreator = groupCreator;
-        mGroupKey = groupKey;
-        mGroupMembers = groupMembers;
     }
 
     public Group() {
@@ -53,14 +40,6 @@ public class Group {
 
     public void setGroupCreator(String groupCreator) {
         mGroupCreator = groupCreator;
-    }
-
-    public int getGroupKey() {
-        return mGroupKey;
-    }
-
-    public void setGroupKey(int groupKey) {
-        mGroupKey = groupKey;
     }
 
     public List<String> getGroupMembers() {

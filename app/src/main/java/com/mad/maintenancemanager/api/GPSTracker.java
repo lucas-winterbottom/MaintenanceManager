@@ -19,6 +19,10 @@ import android.util.Log;
 import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
 
+/**
+ * Class to get location of the device using whatever methods are avialable
+ * Code adapted from https://www.tutorialspoint.com/android/android_location_based_services.htm
+ */
 public class GPSTracker extends Service implements LocationListener {
 
     private final Context mContext;
@@ -50,6 +54,10 @@ public class GPSTracker extends Service implements LocationListener {
         getLocation();
     }
 
+    /**
+     * Gets the current location of the device
+     * @return
+     */
     public Location getLocation() {
         try {
             locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);

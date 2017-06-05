@@ -11,11 +11,15 @@ import com.mad.maintenancemanager.adapter.MemberHolder;
 import com.mad.maintenancemanager.api.DatabaseHelper;
 
 /**
- * Created by lucaswinterbottom on 23/5/17.
+ * Provides the recyclerview to tge group fragement
  */
 
 public class GroupsPresenter {
 
+    /**
+     * Provides a recycler adapter with group members in it
+     * @param listener
+     */
     public void getGroupRecycler(final TasksPresenter.IOnRecyclerAdapterListener listener) {
         String key = DatabaseHelper.getInstance().getGroupKey();
         if (key != null) {

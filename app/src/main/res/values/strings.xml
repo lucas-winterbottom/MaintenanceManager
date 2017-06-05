@@ -179,4 +179,9 @@
     <string name="login">Login</string>
     <string name="future_date">Please choose a date in the future</string>
     <string name="exclamation">!</string>
+    <string name="sign_out_nav_bar">Sign out</string>
+    <string name="create_group">Create group</string>
+    <string name="new_group">New Group</string>
+    <string name="joining_cancelled">Joining Cancelled</string>
+    <string name="select_place_promt">Please select a Place</string>
 </resources>

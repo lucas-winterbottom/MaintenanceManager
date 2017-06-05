@@ -3,7 +3,7 @@ package com.mad.maintenancemanager.model;
 import com.google.android.gms.location.places.Place;
 
 /**
- * Created by lucaswinterbottom on 14/5/17.
+ * POJO for Maintainence task Object
  */
 
 public class MaintenanceTask {

@@ -29,18 +29,18 @@
             android:maxLength="30" />
     </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_horizontal_margin">
+    <!--<android.support.design.widget.TextInputLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="@dimen/activity_horizontal_margin">-->
 
-        <EditText
-            android:id="@+id/add_group_pin_et"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/group_pin"
-            android:inputType="numberPassword" />
-    </android.support.design.widget.TextInputLayout>
+        <!--<EditText-->
+            <!--android:id="@+id/add_group_pin_et"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:hint="@string/group_pin"-->
+            <!--android:inputType="numberPassword" />-->
+    <!--</android.support.design.widget.TextInputLayout>-->
 
     <Button
         android:id="@+id/new_group_create_button"
@@ -48,7 +48,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="40dp"
         android:backgroundTint="@color/colorPrimaryDark"
-        android:text="Create group"
+        android:text="@string/create_group"
         android:textColor="@color/colorAccent"
         android:textStyle="bold" />
     <Button
@@ -57,7 +57,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
         android:backgroundTint="@color/colorPrimaryDark"
-        android:text="Cancel"
+        android:text="@string/cancel"
         android:textColor="@color/colorAccent"
         android:textStyle="bold" />
 </LinearLayout>

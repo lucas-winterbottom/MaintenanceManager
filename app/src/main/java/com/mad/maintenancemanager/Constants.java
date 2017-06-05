@@ -38,4 +38,5 @@ public class Constants {
     public static final String ON_AUTH_STATE_CHANGED_SIGNED_OUT = "onAuthStateChanged:signed_out";
     public static final String SECURITY = "Security";
     public static final String PLACE_STUFF = "Place Stuff";
+    public static final String NEWTASK = "newtask";
 }

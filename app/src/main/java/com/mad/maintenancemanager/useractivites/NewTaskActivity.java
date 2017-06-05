@@ -40,6 +40,7 @@ import java.util.List;
 
 public class NewTaskActivity extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
 
+    public static final String AN_ERROR_OCCURRED = "An error occurred: ";
     private Spinner mGroupMemberSpinner;
     private List<String> mGroupMembers;
     private Spinner mContractorSpinner;
@@ -54,7 +55,7 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
     private int mDay, mMonth, mYear;
     private LocalDate mDueDate;
     private Validator mValidator;
-    private boolean mValidDate;
+    private boolean mValidDate = false;
 
 
     @Override
@@ -132,7 +133,7 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
 
             @Override
             public void onError(Status status) {
-                Log.i("newtask", "An error occurred: " + status);
+                Log.i(Constants.NEWTASK, AN_ERROR_OCCURRED + status);
             }
         });
     }
@@ -158,13 +159,11 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
             public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
                 String date = constructDate(selectedYear, selectedMonth + 1, selectedDay);
                 mDueDate = LocalDate.parse(date);
-                if(mDueDate.isBefore(LocalDate.now())){
-                    Toast.makeText(getApplicationContext(), R.string.future_date,Toast.LENGTH_LONG).show();
+                if (mDueDate.isBefore(LocalDate.now())) {
+                    Toast.makeText(getApplicationContext(), R.string.future_date, Toast.LENGTH_LONG).show();
                     mTaskDueDateEt.setError(getString(R.string.exclamation));
                     mValidDate = false;
-                }
-                else
-                {
+                } else {
                     mTaskDueDateEt.setError(null);
                     mValidDate = true;
                 }
@@ -179,21 +178,32 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onValidationSucceeded() {
-        Intent result = new Intent();
-        MaintenanceTask task = new MaintenanceTask(DatabaseHelper.getInstance().getDisplayName(),
-                mTaskNameEt.getText().toString(),
-                mTaskDescriptionEt.getText().toString(),
-                mContractorSwitch.isChecked(),
-                mGroupMemberSpinner.getSelectedItem().toString(),
-                mTaskExtraItemsEt.getText().toString(),
-                mDueDate.toEpochDay(),
-                mContractorSpinner.getSelectedItem().toString());
-        Gson gson = new GsonBuilder().create();
-        String stringTask = gson.toJson(task, MaintenanceTask.class);
-        result.putExtra(Constants.TASKS, stringTask);
-        result.putExtra(Constants.PLACE,mPlace.getId());
-        setResult(RESULT_OK, result);
-        finish();
+        if (mValidDate) {
+            Intent result = new Intent();
+            MaintenanceTask task = new MaintenanceTask(DatabaseHelper.getInstance().getDisplayName(),
+                    mTaskNameEt.getText().toString(),
+                    mTaskDescriptionEt.getText().toString(),
+                    mContractorSwitch.isChecked(),
+                    mGroupMemberSpinner.getSelectedItem().toString(),
+                    mTaskExtraItemsEt.getText().toString(),
+                    mDueDate.toEpochDay(),
+                    mContractorSpinner.getSelectedItem().toString());
+            Gson gson = new GsonBuilder().create();
+            String stringTask = gson.toJson(task, MaintenanceTask.class);
+            result.putExtra(Constants.TASKS, stringTask);
+            if (mContractorSwitch.isChecked() && mPlace != null) {
+                result.putExtra(Constants.PLACE, mPlace.getId());
+                setResult(RESULT_OK, result);
+                finish();
+            } else if (mContractorSwitch.isChecked() && mPlace == null){
+                Toast.makeText(getApplicationContext(), R.string.select_place_promt, Toast.LENGTH_LONG).show();
+                return;
+            }
+            setResult(RESULT_OK, result);
+            finish();
+        } else {
+            Toast.makeText(getApplicationContext(), R.string.future_date, Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

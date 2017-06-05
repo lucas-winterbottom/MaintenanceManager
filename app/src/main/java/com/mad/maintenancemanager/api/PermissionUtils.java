@@ -32,6 +32,7 @@ import com.mad.maintenancemanager.R;
 
 /**
  * Utility class for access to runtime permissions.
+ * Adapted from https://github.com/googlemaps/android-samples/blob/master/ApiDemos/app/src/main/java/com/example/mapdemo/PermissionUtils.java
  */
 public abstract class PermissionUtils {
 

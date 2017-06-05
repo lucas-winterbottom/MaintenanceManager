@@ -153,8 +153,6 @@ public class SignedInUserActivity extends AppCompatActivity
                 fragment = new CompletedTasksFragment();
             } else if (id == R.id.nav_group) {
                 fragment = new GroupFragment();
-            } else if (id == R.id.nav_account_settings) {
-
             } else if (id == R.id.nav_sign_out) {
                 mAuth.signOut();
                 DatabaseHelper.getInstance().userLogout();

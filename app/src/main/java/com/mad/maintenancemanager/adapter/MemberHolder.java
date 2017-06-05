@@ -13,31 +13,27 @@ import com.mad.maintenancemanager.R;
  * Created by lucaswinterbottom on 19/5/17.
  */
 
+/**
+ * ViewHolder for member objects, used in groupFragment - RecyclerView
+ */
 public class MemberHolder extends RecyclerView.ViewHolder {
 
 
     private final TextView mMemberName;
-    private final Button mDeleteBtn;
 
     public MemberHolder(View itemView) {
         super(itemView);
         mMemberName = (TextView) itemView.findViewById(R.id.name_name);
-        mDeleteBtn = (Button) itemView.findViewById(R.id.group_page_delete);
     }
 
+    /**
+     * Places a string in the appropriate textview of External Task Card
+     *
+     * @param name The string that will be placed in the textview
+     */
     public void setMemberName(String name) {
         mMemberName.setText(name);
     }
 
-    public void setColour(int color) {
-        mMemberName.setTextColor(color);
-    }
 
-    public void setDeleteBtn(boolean isCreator) {
-        if (isCreator) {
-            mDeleteBtn.setVisibility(View.VISIBLE);
-        } else {
-            mDeleteBtn.setVisibility(View.INVISIBLE);
-        }
-    }
 }

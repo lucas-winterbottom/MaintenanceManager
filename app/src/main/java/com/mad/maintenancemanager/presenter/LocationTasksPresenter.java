@@ -23,7 +23,7 @@ import org.threeten.bp.temporal.ChronoUnit;
 import static android.content.Intent.ACTION_DIAL;
 
 /**
- * Created by lucaswinterbottom on 4/6/17.
+ * Class to create recycyler and attach business logic to items in the recycler
  */
 
 public class LocationTasksPresenter {
@@ -34,7 +34,7 @@ public class LocationTasksPresenter {
     }
 
     /**
-     * Gets the user data from Firebase and then extracts the group key to setup recycler
+     * Creates a recylcer adapter to provide back to any screen with external tasks
      */
     public void getTasksRecyclerAdapter(final Query databasePath,
                                         final TasksPresenter.IOnRecyclerAdapterListener listener) {
@@ -63,6 +63,11 @@ public class LocationTasksPresenter {
         };
     }
 
+    /**
+     * Create click listener that start dialer
+     * @param number
+     * @return
+     */
     private OnClickListener getClick(final String number) {
         return new OnClickListener() {
             @Override

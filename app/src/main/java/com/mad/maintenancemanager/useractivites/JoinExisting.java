@@ -21,6 +21,7 @@ public class JoinExisting extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_existing);
+        getSupportActionBar().setTitle(R.string.join_e_group);
 
         mCancelBtn = (Button) findViewById(R.id.existing_group_cancel_btn);
         mJoinBtn = (Button) findViewById(R.id.existing_group_join_btn);
@@ -43,5 +44,11 @@ public class JoinExisting extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(ResultCodes.CANCELED);
+        super.onBackPressed();
     }
 }
