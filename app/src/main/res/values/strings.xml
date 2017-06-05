@@ -184,4 +184,6 @@
     <string name="new_group">New Group</string>
     <string name="joining_cancelled">Joining Cancelled</string>
     <string name="select_place_promt">Please select a Place</string>
+    <string name="locations_acess_toast">You must provide location access to use this app</string>
+    <string name="invalid_group_code">Invalid group code</string>
 </resources>

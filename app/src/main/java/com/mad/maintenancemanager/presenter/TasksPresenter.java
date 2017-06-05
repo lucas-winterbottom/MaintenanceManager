@@ -21,6 +21,9 @@ import org.threeten.bp.temporal.ChronoUnit;
 
 import java.util.List;
 
+/**
+ * Class to create recycyler and attach business logic to items in the recycler
+ */
 
 public class TasksPresenter {
     private Context mContext;
@@ -32,7 +35,7 @@ public class TasksPresenter {
     private FirebaseRecyclerAdapter adapter;
 
     /**
-     * Gets the user data from Firebase and then extracts the group key to setup recycler
+     * Creates a recycler adapter to provide back to any screen with active/completed tasks
      */
     public void getTasksRecyclerAdapter(final Query databasePath,
                                         final IOnRecyclerAdapterListener listener,
@@ -76,12 +79,20 @@ public class TasksPresenter {
         };
     }
 
-
+    /**
+     * listeners for the recyclerAdapter
+     */
     public interface IOnRecyclerAdapterListener {
         void onRecyclerAdapter(FirebaseRecyclerAdapter adapter);
 
     }
 
+    /**
+     * Calculates the number of days between task due date and current date
+     *
+     * @param date
+     * @return
+     */
     private String calculateDays(long date) {
         String daysText;
         LocalDate dueDate = LocalDate.ofEpochDay(date);
@@ -99,6 +110,14 @@ public class TasksPresenter {
         }
     }
 
+    /**
+     * Creates a long click that diplays and dialog and shows options for the long-presssed task
+     *
+     * @param taskName
+     * @param position
+     * @param adapter
+     * @param activityContext
+     */
     private void makeLongClick(final String taskName, final int position
             , final FirebaseRecyclerAdapter adapter, final Context activityContext) {
 

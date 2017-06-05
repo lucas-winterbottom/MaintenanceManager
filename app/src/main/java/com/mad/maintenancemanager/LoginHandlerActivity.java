@@ -29,6 +29,10 @@ import com.mobsandgeeks.saripaar.annotation.Password;
 
 import java.util.List;
 
+/**
+ * Activity that handles login requestes, makes sure user has required data server side
+ * while doing so displays a progressbar
+ */
 public class LoginHandlerActivity extends AppCompatActivity {
 
     private String mTradeType;
@@ -85,6 +89,9 @@ public class LoginHandlerActivity extends AppCompatActivity {
 
     }
 
+    /**
+     *  Builds a dialog so trade users can select their trade
+     */
     private void buildTradeDialog() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginHandlerActivity.this);
@@ -124,6 +131,9 @@ public class LoginHandlerActivity extends AppCompatActivity {
         builder.show();
     }
 
+    /**
+     * Builds a dialog so that general users can input their mobile no
+     */
     public void buildGeneralDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(LoginHandlerActivity.this);
         View dialogView = getLayoutInflater().inflate(R.layout.custom_dialog, null);

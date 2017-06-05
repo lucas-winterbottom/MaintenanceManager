@@ -25,7 +25,11 @@ import com.mad.maintenancemanager.model.Group;
 import com.mad.maintenancemanager.presenter.GroupsPresenter;
 import com.mad.maintenancemanager.presenter.TasksPresenter;
 
-
+/**
+ * Fragment thats shows the information and user for the users group,
+ * or
+ * Shows them the option to join
+ */
 public class GroupFragment extends Fragment implements View.OnClickListener {
 
     public static final int REQUEST_CODE = 123;
@@ -94,7 +98,9 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
-
+    /**
+     * Provide the fabs for a user with group or not
+     */
     private void alternateFabs() {
         mExistingGroupFab.setVisibility(View.GONE);
         mNewGroupTab.setVisibility(View.GONE);
@@ -125,6 +131,9 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         //// TODO: 20/5/17 Add method to invite user.
     }
 
+    /**
+     * one the user joins a group refresh the fragment
+     */
     public void refreshFragment() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.detach(this).attach(this).commit();
@@ -153,7 +162,7 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
                             refreshFragment();
                             mUnlocker.unlockNavDrawer();
                         } else {
-                            Toast.makeText(getContext(), "Invalid group code", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.invalid_group_code, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -165,6 +174,9 @@ public class GroupFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * Unlocks the nav drawer when required
+     */
     public interface INavUnlocker {
         void unlockNavDrawer();
     }

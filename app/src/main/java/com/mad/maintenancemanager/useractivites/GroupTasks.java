@@ -29,8 +29,7 @@ import com.mad.maintenancemanager.model.MaintenanceTask;
 import com.mad.maintenancemanager.presenter.TasksPresenter;
 
 /**
- * Fragment that shows the user the tasks for the group they are currently in, gathers the users
- * group and then uses that to gather the
+ * Fragment that shows the user the tasks for the group they are currently in
  */
 public class GroupTasks extends Fragment {
 

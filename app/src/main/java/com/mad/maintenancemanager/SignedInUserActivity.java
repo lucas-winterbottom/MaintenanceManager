@@ -29,7 +29,7 @@ import com.squareup.picasso.Picasso;
 import com.mad.maintenancemanager.useractivites.SplashFragment;
 
 /**
- * Activity that is the basis for a user that is signed in and has a navigation drawer
+ * Activity that is the basis for a general user that is signed in and has a navigation drawer
  * to navigate between fragments
  */
 public class SignedInUserActivity extends AppCompatActivity
@@ -80,7 +80,6 @@ public class SignedInUserActivity extends AppCompatActivity
             }
         });
 
-
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -102,6 +101,9 @@ public class SignedInUserActivity extends AppCompatActivity
 
     }
 
+    /**
+     * shows splashScren
+     */
     private void splashScreen() {
         Fragment fragment = new SplashFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -129,10 +131,16 @@ public class SignedInUserActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * locks the nav Drawer
+     */
     private void lockNavDrawer() {
         mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
+    /**
+     * Unlocks the nav drawer
+     */
     public void unlockNavDrawer() {
         mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }

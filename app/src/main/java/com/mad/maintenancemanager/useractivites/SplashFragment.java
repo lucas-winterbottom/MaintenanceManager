@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 
 import com.mad.maintenancemanager.R;
 
+/**
+ * Fragment that appears while task is loading
+ */
 
 public class SplashFragment extends Fragment {
 

@@ -11,6 +11,9 @@ import com.firebase.ui.auth.ResultCodes;
 import com.mad.maintenancemanager.Constants;
 import com.mad.maintenancemanager.R;
 
+/**
+ * Activity to join existing group
+ */
 public class JoinExisting extends AppCompatActivity {
 
     private Button mCancelBtn;

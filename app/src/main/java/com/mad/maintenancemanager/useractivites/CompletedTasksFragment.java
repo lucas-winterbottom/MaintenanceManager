@@ -17,6 +17,9 @@ import com.mad.maintenancemanager.R;
 import com.mad.maintenancemanager.api.DatabaseHelper;
 import com.mad.maintenancemanager.presenter.TasksPresenter;
 
+/**
+ * fragment that shows the completed tasks for the users group
+ */
 public class CompletedTasksFragment extends Fragment {
 
 

@@ -1,7 +1,7 @@
 package com.mad.maintenancemanager;
 
 /**
- * Created by lucaswinterbottom on 8/5/17.
+ * Contains most of the constants used in the code
  */
 
 public class Constants {
@@ -39,4 +39,5 @@ public class Constants {
     public static final String SECURITY = "Security";
     public static final String PLACE_STUFF = "Place Stuff";
     public static final String NEWTASK = "newtask";
+    public static final String ON_AUTH_STATE_CHANGED_SIGNED_IN = "onAuthStateChanged:signed_in:";
 }

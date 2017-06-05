@@ -28,7 +28,7 @@ import com.mad.maintenancemanager.presenter.LocationTasksPresenter;
 import com.mad.maintenancemanager.presenter.TasksPresenter;
 
 /**
- * A simple {@link Fragment} subclass.
+ * fragment to show  the available tasks at the clicked location
  */
 public class LocationTasksFragment extends DialogFragment {
 
@@ -56,7 +56,7 @@ public class LocationTasksFragment extends DialogFragment {
         mRecycler.setHasFixedSize(false);
         mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-
+        //Setup Recycler
         Query ref = FirebaseDatabase.getInstance().getReference(Constants.EXTERNAL_TASKS)
                 .orderByChild(Constants.TASK_LOCATION).equalTo(getArguments().getString(Constants.TASK_LOCATION));
         LocationTasksPresenter presenter = new LocationTasksPresenter(getActivity());
@@ -72,6 +72,9 @@ public class LocationTasksFragment extends DialogFragment {
         return rootView;
     }
 
+    /**
+     * hide the progress bar
+     */
     private void hideProgress() {
         mProgress.setVisibility(View.GONE);
     }

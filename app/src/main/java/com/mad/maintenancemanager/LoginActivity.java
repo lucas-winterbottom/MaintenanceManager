@@ -50,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    Log.d(Constants.FIREBASE, "onAuthStateChanged:signed_in:" + user.getUid());
+                    Log.d(Constants.FIREBASE, Constants.ON_AUTH_STATE_CHANGED_SIGNED_IN + user.getUid());
                     Intent intent = new Intent(LoginActivity.this, LoginHandlerActivity.class);
                     startActivity(intent);
                     finish();

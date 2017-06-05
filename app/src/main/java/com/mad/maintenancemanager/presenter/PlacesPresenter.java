@@ -21,15 +21,12 @@ import com.mad.maintenancemanager.model.TempPlace;
 import java.util.List;
 
 /**
- * Created by lucaswinterbottom on 4/6/17.
+ * Class that provides Google place information from place IDs
  */
 
-public class PlacesPresenter implements
-        GoogleApiClient.OnConnectionFailedListener,
-        GoogleApiClient.ConnectionCallbacks {
+public class PlacesPresenter {
 
 
-    private static final int GOOGLE_API_CLIENT_ID = 0;
     private GoogleApiClient mGoogleApiClient;
     private Context mContext;
     private GoogleMap mGoogleMap;
@@ -40,7 +37,9 @@ public class PlacesPresenter implements
         mGoogleMap = googleMap;
     }
 
-    //// TODO: 4/6/17 maybe tidy idk if possible to
+    /**
+     * Sets the task places on the mapview and stores the needed information to start a fragment
+     */
     public void setTaskPlaces() {
         DatabaseHelper.getInstance().getTradieTasks(new DatabaseHelper.IExternalTasksListener() {
             @Override
@@ -56,7 +55,7 @@ public class PlacesPresenter implements
                                         Marker m = mGoogleMap.addMarker(new MarkerOptions()
                                                 .position(myPlace.getLatLng())
                                                 .title(myPlace.getName().toString()));
-                                        m.setTag(new TempPlace(myPlace.getId(),myPlace.getName().toString()));
+                                        m.setTag(new TempPlace(myPlace.getId(), myPlace.getName().toString()));
                                     } else {
                                     }
 
@@ -67,21 +66,6 @@ public class PlacesPresenter implements
 
             }
         });
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
 

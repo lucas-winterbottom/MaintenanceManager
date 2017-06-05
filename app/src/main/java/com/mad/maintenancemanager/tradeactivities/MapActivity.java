@@ -39,6 +39,10 @@ import com.mad.maintenancemanager.presenter.PlacesPresenter;
 
 import java.util.List;
 
+/**
+ * Activity that shows a Google Map with pins on it for task locations that are near your
+ * current location
+ */
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -74,6 +78,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Creates Google API Clients to provide to PlacePresenter
+     */
     private void createGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(MapActivity.this)
                 .addApi(Places.GEO_DATA_API)
@@ -93,10 +100,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             // Enable the my location layer if the permission has been granted.
             prepMap();
         } else {
-            // Display the missing permission error dialog when the fragments resume.//// TODO: 4/6/17 handle denied permissions
+            Toast.makeText(getApplicationContext(), R.string.locations_acess_toast,Toast.LENGTH_LONG).show();
+            finish();
         }
     }
 
+    /**
+     * Sets up map fragment
+     */
     private void prepMap() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -130,6 +141,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+    /**
+     * Moves map to current locationa and adds pins for task locations
+     * @param googleMap
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
@@ -180,6 +195,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+    /**
+     * makes dialog fragment for loactions showing available tasks
+     * @param marker
+     * @return
+     */
     @Override
     public boolean onMarkerClick(Marker marker) {
         TempPlace place = (TempPlace) marker.getTag();

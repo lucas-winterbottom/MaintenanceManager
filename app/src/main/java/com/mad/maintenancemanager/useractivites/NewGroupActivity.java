@@ -19,6 +19,9 @@ import com.mobsandgeeks.saripaar.annotation.Password;
 
 import java.util.List;
 
+/**
+ * Activity to setup new group, validation to make sure the group name is not null
+ */
 public class NewGroupActivity extends AppCompatActivity implements Validator.ValidationListener {
 
     @NotEmpty
@@ -62,6 +65,9 @@ public class NewGroupActivity extends AppCompatActivity implements Validator.Val
 
     }
 
+    /**
+     * IF fields are right return result to the caller
+     */
     @Override
     public void onValidationSucceeded() {
         Intent result = new Intent();

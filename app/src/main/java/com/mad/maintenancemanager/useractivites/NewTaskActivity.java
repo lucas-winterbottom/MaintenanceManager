@@ -38,6 +38,11 @@ import java.sql.Date;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * Activity that provides the user the required fields to create a maintenance task
+ * has validation to make sure the user inputs data correctly
+ */
+
 public class NewTaskActivity extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
 
     public static final String AN_ERROR_OCCURRED = "An error occurred: ";
@@ -102,6 +107,9 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
         mValidator.setValidationListener(this);
     }
 
+    /**
+     * Sets up memeber spinner
+     */
     private void setupMemberSpinner() {
 //         Create an ArrayAdapter using the group member array and a default spinner layout
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mGroupMembers);
@@ -112,6 +120,9 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
         mGroupMemberSpinner.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Sets up type Spinner
+     */
     private void setupTypeSpinner() {
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -122,6 +133,9 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
         mContractorSpinner.setAdapter(adapter);
     }
 
+    /**
+     * Sets up Place Fragment
+     */
     private void setupPlaceFragment() {
         mAutocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -143,11 +157,21 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
         mValidator.validate();
     }
 
+    /**
+     * Constructs date from the data provided
+     * @param selectedYear
+     * @param selectedMonth
+     * @param selectedDay
+     * @return
+     */
     private String constructDate(int selectedYear, int selectedMonth, int selectedDay) {
         return Date.valueOf(selectedYear + "-" + selectedMonth + "-" + selectedDay).toString();
     }
 
-    //// TODO: 29/5/17 Consider moving to presenter same with setups
+    /**
+     * Shows date picker and tells user if they put a date in the past
+     * @param view
+     */
     public void showDatePicker(View view) {
         //To show current date in the DatePicker
         Calendar mCurrentDate = Calendar.getInstance();
@@ -176,6 +200,9 @@ public class NewTaskActivity extends AppCompatActivity implements View.OnClickLi
         mDatePicker.show();
     }
 
+    /**
+     * passes the data back to create the task
+     */
     @Override
     public void onValidationSucceeded() {
         if (mValidDate) {
